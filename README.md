@@ -60,7 +60,9 @@ Vous avez besoin de votre ordinateur avec Docker et docker-compose. Vous trouver
 
 ## Démarrage de l'environnement virtuel
 
-### Ce laboratoire utilise docker-compose, un outil pour la gestion d'applications utilisant multiples conteneurs. Il va se charger de créer un réseaux virtuel `lan`, la machine IDS et une machine "Client". Le réseau LAN interconnecte les deux machines.
+Ce laboratoire utilise docker-compose, un outil pour la gestion d'applications utilisant multiples conteneurs. Il va se charger de créer un réseaux virtuel `lan`, la machine IDS et une machine "Client". Le réseau LAN interconnecte les deux machines (voir schéma ci-dessous).
+
+![Plan d'adressage](images/docker-snort.png)
 
 Nous allons commencer par lancer docker-compose. Il suffit de taper la commande suivante dans le répertoire racine du labo, celui qui contient le fichier [docker-compose.yml](docker-compose.yml). Optionnelement vous pouvez lancer le script [up.sh](scripts/up.sh) qui se trouve dans le répertoire [scripts](scripts), ainsi que d'autres scripts utiles pour vous :
 
@@ -92,7 +94,7 @@ docker exec -it <nom_de_la_machine> /bin/bash
 Par exemple, pour ouvrir un terminal sur votre IDS :
 
 ```bash
-docker exec -it Firewall /bin/bash
+docker exec -it IDS /bin/bash
 ```
 
 Optionnelement, vous pouvez utiliser les scripts [openids.sh](scripts/openids.sh) et [openclient.sh](scripts/openclient.sh) pour contacter les conteneurs.
