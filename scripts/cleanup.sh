@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# openlan.sh
+# cleanup.sh
 #
 # Get rid of all the mess 
 # created by the lab
