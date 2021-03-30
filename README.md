@@ -132,7 +132,7 @@ apt install snort
 
 Ceci télécharge et installe la version la plus récente de Snort.
 
-Vers la fin de l'installation, on vous demandera de fournir deux informations :
+Il est possible que vers la fin de l'installation, on vous demande de fournir deux informations :
 
 - Le nom de l'interface sur laquelle snort doit surveiller - il faudra répondre ```eth0```
 - L'adresse de votre réseau HOME. Il s'agit du réseau que vous voulez protéger. Cela sert à configurer certaines variables pour Snort. Vous pouvez répondre ```192.168.1.0/24```.
@@ -434,7 +434,7 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 --
 
-### Detecter un ping d'un autre système
+### Détecter un ping d'un autre système
 
 Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un ping depuis une autre machine (la seule autre machine que vous avez à disposition c'est la machine Client). Assurez-vous que **ça n'alerte pas** quand c'est vous qui envoyez le ping depuis l'IDS vers un autre système !
 
@@ -465,7 +465,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 ---
 
 
-**Question 12: Qu'est-ce qui a été journalisé ?**
+**Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
 
 ---
 
