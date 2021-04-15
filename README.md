@@ -348,6 +348,10 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 **Réponse :**  
 
+Les preprocesseurs sont des plug-in qu'on peut ajouter à Snort afin d'amener d'autres fonctionnalités pour détécter des anomalies. Les preprocesseurs gèrent les paquets avant les règles de Snort. Par exemple il existe le preprocesseur "Stream4" permettant de détécter des scans. 
+
+www.oreilly.com/library/view/snort-cookbook/0596007914/ch04.html
+
 ---
 
 **Question 2: Pourquoi êtes vous confronté au WARNING suivant `"No preprocessors configured for policy 0"` lorsque vous exécutez la commande `snort` avec un fichier de règles ou de configuration "fait-maison" ?**
@@ -355,6 +359,8 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 ---
 
 **Réponse :**  
+
+Car nous n'avons pas configurer de preprocesseurs pour notre fichier de règles ou de configuration "fait-maison".
 
 ---
 
