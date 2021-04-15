@@ -122,7 +122,7 @@ Pour permettre à votre machine Client de contacter l'Internet à travers la mac
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
 
-**Remarque** : J'ai dû utiliser `iptables-legacy` pour que cette commande fonctionne.
+**Remarque** : J'ai dû utiliser `iptables-legacy` pour que cette commande fonctionne sur le WSL (sur une VM Kali pas besoin).
 
 Cette commande `iptables` définit une règle dans le tableau NAT qui permet la redirection de ports et donc, l'accès à l'Internet pour la machine Client.
 
@@ -738,7 +738,7 @@ Elle permet de détecter des connexions venant de la machine client, peu importe
 
 ---
 
-**Réponse :**  Bizarrement Snort ne met rien dans le fichier *alert* et crée aussi un fichier snort.log.xxxxxxxxxx **TODO**
+**Réponse :**  Bizarrement Snort ne met rien dans le fichier *alert* et crée aussi un fichier snort.log.xxxxxxxxxx. Même en ayant tester Snort sur une VM Kali dans le cas où le problème viendrait du WSL, même résultat... Discussion sur Teams avec M. Rubinstein concernant ce problème.
 
 ---
 
@@ -778,7 +778,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  Oui normalement mais là problème **TODO**
+**Réponse :**  Même problème que pour la détection de login SSH, les fichiers sont créés mais restent vides. Même en ayant tester Snort sur une VM Kali dans le cas où le problème viendrait du WSL, même résultat... Discussion sur Teams avec M. Rubinstein concernant ce problème.
 
 ---
 
@@ -826,6 +826,12 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 
 **Réponse :**  
 
+```
+alert tcp any any -> 192.168.1.2 22 (flags:S; msg:"SYN Scan"; sid: 4000018; rev:1;)
+```
+
+
+
 ---
 
 
@@ -848,6 +854,19 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
+Snort a bien détecté le premier scan sans fragmentation : 
+
+```
+[**] [1:4000018:1] SYN Scan [**]
+[Priority: 0]
+04/15-12:17:21.737239 192.168.1.3:64872 -> 192.168.1.2:22
+TCP TTL:57 TOS:0x0 ID:64064 IpLen:20 DgmLen:44
+******S* Seq: 0xC7C92EA3  Ack: 0x0  Win: 0x400  TcpLen: 24
+TCP Options (1) => MSS: 1460
+```
+
+Cependant, le deuxième est passé entre les mailles du filet.
+
 ---
 
 
@@ -858,7 +877,16 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  Le SYN scan a bien été détecté.
+
+```
+[**] [1:4000018:1] SYN Scan [**]
+[Priority: 0]
+04/15-12:28:18.038203 192.168.1.3:64751 -> 192.168.1.2:22
+TCP TTL:53 TOS:0x0 ID:51725 IpLen:20 DgmLen:44
+******S* Seq: 0xCEBF607B  Ack: 0x0  Win: 0x400  TcpLen: 24
+TCP Options (1) => MSS: 1460
+```
 
 ---
 
@@ -867,7 +895,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  Il permet d'inspecter le trafic SSL et, comme c'est une opération coûteuse, il est possible de déterminer dans Snort à quel moment stopper l'inspection. Il est capable d'inspecter des paquets SSL car une portion de ceux-ci n'est pas chiffrée et permette d'obtenir des informations sur le trafic lui-même (notamment dans le handshake SSL).
 
 ---
 
@@ -876,7 +904,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  Il permet la détection et le filtrage de données sensibles comme les numéros de cartes de crédit, les numéros AVS et les adresses mails.
 
 ---
 
@@ -887,7 +915,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  C'est un outil très complet qui permet de mettre en place des règles complexes et comme il est open source, il est possible de compter sur la communauté pour nous fournir des configurations pré-faites efficaces. Cependant, ayant eu des problèmes concernant la détection de certains trafics en ayant configuré des règles pourtant simples, nous nous interrogeons sur sa fiabilité. L'arrêt du système de détection n'a jamais pu être effectué normalement (utilisation de la commande `kill`), ce qui nous empêchait d'avoir le rapport de détection, ce qui peut être handicapant.
 
 ---
 
