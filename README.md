@@ -454,7 +454,7 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 ---
 
-**Réponse :**  ` log tcp 192.168.10.3 any <> 91.198.174.192 any (msg:"Wikipedia"; sid:4000015; rev:1;)` 
+**Réponse :**  ` log tcp 192.168.10.3 any <> 91.198.174.192 any (sid:4000015; rev:1;)` 
 
 Dans `/var/log/snort/snort.log.XXXXXXXXXXXXX
 
@@ -473,6 +473,8 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 ---
 
 **Réponse :**  `alert icmp any any -> 192.168.10.2 any (msg:"ICMP Packet";itype:8; sid:4000001; rev:3;)`
+
+192.168.10.2 est l'ip résolu par le client pour wikipedia.
 
 ---
 
@@ -512,7 +514,7 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 ---
 
-**Réponse :**   `alert icmp any any -> 192.168.10.2 any (msg:"ICMP Packet"; sid:4000001; rev:3;)`
+**Réponse :**   `alert icmp any any <> 192.168.10.2 any (msg:"ICMP Packet";itype:8; sid:4000001; rev:3;)`
 
 ---
 
@@ -527,7 +529,9 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Réponse :**  
+**Réponse :**  `alert tcp 192.168.10.3 any -> 192.168.10.2 22 (msg:"SSH"; sid:4000003; rev:1;)`
+
+On crée une alerte lorsqu'une paquet provenant de la machine client vers l'IPS sur le port 22 est détecte
 
 ---
 
@@ -537,6 +541,16 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 ---
 
 **Réponse :**  
+
+```
+[**] [1:4000003:1] SSH [**]
+[Priority: 0] 
+04/15-15:22:18.418934 192.168.10.2:22 -> 192.168.10.3:51454
+TCP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:40 DF
+***A*R** Seq: 0x0  Ack: 0x7CC6B1AE  Win: 0x0  TcpLen: 20
+```
+
+
 
 ---
 
@@ -558,7 +572,7 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 ---
 
-**Réponse :**  
+**Réponse :**  `-r`
 
 ---
 
@@ -568,7 +582,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Il va analyser chaque paquet et appliquer les règles si fournis. Non, il s'agit du même fonctionnement
 
 ---
 
@@ -576,7 +590,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Si on lui précise les règles oui.
 
 ---
 
@@ -590,7 +604,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+**Réponse :**  A effectuer des attaques sur un réseau avec un NIDS
 
 ---
 
@@ -599,16 +613,19 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+**Réponse :**  Utiliser des packets fragmenté pour éviter la détection
 
 ---
-
 
 **Question 21: Qu'est-ce que le `Frag3 Preprocessor` ? A quoi ça sert et comment ça fonctionne ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**  Un preprocessor pour snort qui vise à empêcher les attaques par paquets fragmentés. 
+
+# PAR MAGIE
+
+
 
 ---
 
