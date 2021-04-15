@@ -108,7 +108,7 @@ Dans un terminal de votre machine Client, taper les commandes suivantes :
 
 ```bash
 ip route del default 
-ip route add default via 192.168.1.2
+ip route add default via 192.168.10.2
 ```
 
 Ceci configure la machine IDS comme la passerelle par défaut pour la machine Client.
@@ -344,6 +344,8 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 **Question 1: Qu'est ce que signifie les "preprocesseurs" dans le contexte de Snort ?**
 
+Modules utilisateurs qui peuvent ajouter des fonctionnalités , notamment afin de pouvoir décoder des paquets pour que snort puisse les traiter.
+
 ---
 
 **Réponse :**  
@@ -355,6 +357,8 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 ---
 
 **Réponse :**  
+
+Parce que aucun preprocessor n'est chargé.
 
 ---
 
@@ -372,6 +376,9 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 **Réponse :**  
 
+Générer une alerte et écrire le paquet dans le journal pour les connections tcp dans n'importe quel sens et n'importe quel destinataire, si les options sont valides.
+Pour qu'une alerte soit généré, il faut que dans le contenu soit présent "Rubinstein". Le paquet sera alors écrit avec l’entête "Mon nom!" et le sid et le numéro de révision.
+
 ---
 
 Utiliser nano pour créer un fichier `myrules.rules` sur votre répertoire home (```/root```). Rajouter une règle comme celle montrée avant mais avec votre text, phrase ou mot clé que vous aimeriez détecter. Lancer Snort avec la commande suivante :
@@ -384,7 +391,7 @@ sudo snort -c myrules.rules -i eth0
 
 ---
 
-**Réponse :**  
+**Réponse :**  Les paramètres de configurations de snort, avec une compte de toutes les règles actives par protocoles concernés
 
 ---
 
@@ -394,7 +401,7 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ---
 
-**Réponse :**  
+**Réponse :**  WARNING: No preprocessors configured for policy 0. Le journal a une nouvelle entrée avec le nom attendu
 
 ---
 
@@ -404,18 +411,35 @@ Arrêter Snort avec `CTRL-C`.
 
 ---
 
-**Réponse :**  
+**Réponse :**  Un récapitulatif de la session avec de nombreuses statistiques
+
+- Runtime avec nombre de paquets et intensité du traffic (paquets par minutes/secondes)
+- Usage memoire
+- Des statistiques sur les paquets (Nombre recus, pourcentage analysé, rejeté, filtré, ignoré)
+- Statistique des paquets par protocole
+- Statistique des actions entreprises (Nombre de paquet)
 
 ---
 
 
-Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il y ait des alertes pour votre text choisi.
+Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il y ait des alertes pour votre textes choisi.
 
 **Question 7: A quoi ressemble l'alerte ? Qu'est-ce que chaque élément de l'alerte veut dire ? Décrivez-la en détail !**
 
 ---
 
 **Réponse :**  
+
+```
+[**] [1:4000016:1] Malediction [**] 								## Entete: SID:Revision: Message name
+[Priority: 0] 													    ## Priorité du paquet
+04/15-14:26:46.124980 13.225.25.13:80 -> 192.168.10.3:43494			## Timestamps source -> destination
+TCP TTL:240 TOS:0x0 ID:27166 IpLen:20 DgmLen:1480					## Protocol IP Headers
+***A**** Seq: 0xF23B8378  Ack: 0x85835865  Win: 0x80  TcpLen: 32	## More Headers
+TCP Options (3) => NOP NOP TS: 2640528150 4253956880
+```
+
+
 
 ---
 
@@ -430,7 +454,11 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 ---
 
-**Réponse :**  
+**Réponse :**  ` log tcp 192.168.10.3 any <> 91.198.174.192 any (msg:"Wikipedia"; sid:4000015; rev:1;)` 
+
+Dans `/var/log/snort/snort.log.XXXXXXXXXXXXX
+
+Le paquet IP dans un fichier .pcap
 
 ---
 
@@ -444,16 +472,15 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+**Réponse :**  `alert icmp any any -> 192.168.10.2 any (msg:"ICMP Packet";itype:8; sid:4000001; rev:3;)`
 
 ---
-
 
 **Question 10: Comment avez-vous fait pour que ça identifie seulement les pings entrants ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**  On regarde le type field et on alert si il vaut 8 (ECHO REQUEST)
 
 ---
 
@@ -462,7 +489,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+**Réponse :**  Dans `/var/log/snort/snort.log.XXXXXXXXXXXXX et dans /var/log/snort/alert
 
 ---
 
@@ -471,7 +498,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+**Réponse :**  ```15:14:23.090275 IP Client.lan > IDS: ICMP echo request, id 29204, seq 19, length 64```
 
 ---
 
@@ -485,7 +512,7 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 ---
 
-**Réponse :**  
+**Réponse :**   `alert icmp any any -> 192.168.10.2 any (msg:"ICMP Packet"; sid:4000001; rev:3;)`
 
 ---
 
