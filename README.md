@@ -346,7 +346,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Les préprocesseurs étendent la fonctionnalité de Snort en permettant aux utilisateurs et aux programmeurs d'y intégrer facilement des plugins modulaires. Grâce à ce mécanisme, les paquets peuvent être modifiés ou analysés de manière "out-of-band" avant que le mécanisme de détection ne soit lancé.
 
 ---
 
@@ -354,7 +354,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Car aucun préprocesseur n'a été configuré dans notre fichier de configuration. Il faut activer les préprocesseurs dans le fichier de configuration.
 
 ---
 
@@ -370,7 +370,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  
+**Réponse :**  La règle génère une alerte lorsqu'un paquet TCP en provenance de n'importe où (adresses et ports) et à destination de n'importe où (adresses et ports) contient "Rubinstein". Le paquet sera écrit dans le journal.
 
 ---
 
@@ -386,6 +386,104 @@ sudo snort -c myrules.rules -i eth0
 
 **Réponse :**  
 
+```
+ --== Initializing Snort ==--
+Initializing Output Plugins!
+Initializing Preprocessors!
+Initializing Plug-ins!
+Parsing Rules file "myrules.rules"
+Tagged Packet Limit: 256
+Log directory = /var/log/snort
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Initializing rule chains...
+1 Snort rules read
+    1 detection rules
+    0 decoder rules
+    0 preprocessor rules
+1 Option Chains linked into 1 Chain Headers
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++-------------------[Rule Port Counts]---------------------------------------
+|             tcp     udp    icmp      ip
+|     src       0       0       0       0
+|     dst       0       0       0       0
+|     any       1       0       0       0
+|      nc       0       0       0       0
+|     s+d       0       0       0       0
++----------------------------------------------------------------------------
+
++-----------------------[detection-filter-config]------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[detection-filter-rules]-------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[rate-filter-config]-----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[rate-filter-rules]------------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[event-filter-config]----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[event-filter-global]----------------------------------
++-----------------------[event-filter-local]-----------------------------------
+| none
++-----------------------[suppression]------------------------------------------
+| none
+-------------------------------------------------------------------------------
+Rule application order: pass->drop->sdrop->reject->alert->log
+Verifying Preprocessor Configurations!
+
+[ Port Based Pattern Matching Memory ]
++-[AC-BNFA Search Info Summary]------------------------------
+| Instances        : 1
+| Patterns         : 1
+| Pattern Chars    : 7
+| Num States       : 7
+| Num Match States : 1
+| Memory           :   1.60Kbytes
+|   Patterns       :   0.04K
+|   Match Lists    :   0.09K
+|   Transitions    :   1.07K
++-------------------------------------------------
+pcap DAQ configured to passive.
+Acquiring network traffic from "eth0".
+Reload thread starting...
+Reload thread started, thread 0x7fe1191bc700 (1177)
+Decoding Ethernet
+
+        --== Initialization Complete ==--
+
+   ,,_     -*> Snort! <*-
+  o"  )~   Version 2.9.15.1 GRE (Build 15125) 
+   ''''    By Martin Roesch & The Snort Team: http://www.snort.org/contact#team
+           Copyright (C) 2014-2019 Cisco and/or its affiliates. All rights reserved.
+           Copyright (C) 1998-2013 Sourcefire, Inc., et al.
+           Using libpcap version 1.10.0 (with TPACKET_V3)
+           Using PCRE version: 8.39 2016-06-14
+           Using ZLIB version: 1.2.11
+```
+
+À l'initialisation, Snort: 
+
+- initialise les plugins et préprocesseurs
+
+- parse le fichier de règles: `Parsing Rules file "myrules.rules"`
+
+- le log directory est `/var/log/snort`
+
+Snort initialise ensuite les règles. On voit que Snort a lu notre règle: `1 Snort rules read`. C'est une règle de détection.
+
+Dans le tableau `Rule Port Counts`, on voit que la règle agit sur le protocole TCP pour n'importe qu'elle source et destination.
+
+Ensuite, il décrit les filtres et vérifie les configurations du préprocesseur.
+
+Il récupère le trafic du réseau spécifié. Ici, `eth0`.
+
+L'initialisation est ainsi terminée.
+
 ---
 
 Aller à un site web contenant dans son text la phrase ou le mot clé que vous avez choisi (il faudra chercher un peu pour trouver un site en http... Si vous n'y arrivez pas, vous pouvez utiliser [http://neverssl.com](http://neverssl.com) et modifier votre votre règle pour détecter un morceau de text contenu dans le site).
@@ -395,6 +493,15 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 ---
 
 **Réponse :**  
+
+```
+Commencing packet processing (pid=1201)
+WARNING: No preprocessors configured for policy 0.
+WARNING: No preprocessors configured for policy 0.
+...
+```
+
+Comme on n'active toujours pas de préprocesseurs dans notre fichier de règle, le warning est toujours présent. (CF. question 2)
 
 ---
 
@@ -406,6 +513,111 @@ Arrêter Snort avec `CTRL-C`.
 
 **Réponse :**  
 
+```
+*** Caught Int-Signal
+WARNING: No preprocessors configured for policy 0.
+===============================================================================
+Run time for packet processing was 38.14893 seconds
+Snort processed 47 packets.
+Snort ran for 0 days 0 hours 0 minutes 38 seconds
+   Pkts/sec:            1
+===============================================================================
+Memory usage summary:
+  Total non-mmapped bytes (arena):       4096000
+  Bytes in mapped regions (hblkhd):      30265344
+  Total allocated space (uordblks):      3346688
+  Total free space (fordblks):           749312
+  Topmost releasable block (keepcost):   591872
+===============================================================================
+Packet I/O Totals:
+   Received:           50
+   Analyzed:           47 ( 94.000%)
+    Dropped:            0 (  0.000%)
+   Filtered:            0 (  0.000%)
+Outstanding:            3 (  6.000%)
+   Injected:            0
+===============================================================================
+Breakdown by protocol (includes rebuilt packets):
+        Eth:           47 (100.000%)
+       VLAN:            0 (  0.000%)
+        IP4:           45 ( 95.745%)
+       Frag:            0 (  0.000%)
+       ICMP:            1 (  2.128%)
+        UDP:           16 ( 34.043%)
+        TCP:           28 ( 59.574%)
+        IP6:            0 (  0.000%)
+    IP6 Ext:            0 (  0.000%)
+   IP6 Opts:            0 (  0.000%)
+      Frag6:            0 (  0.000%)
+      ICMP6:            0 (  0.000%)
+       UDP6:            0 (  0.000%)
+       TCP6:            0 (  0.000%)
+     Teredo:            0 (  0.000%)
+    ICMP-IP:            0 (  0.000%)
+    IP4/IP4:            0 (  0.000%)
+    IP4/IP6:            0 (  0.000%)
+    IP6/IP4:            0 (  0.000%)
+    IP6/IP6:            0 (  0.000%)
+        GRE:            0 (  0.000%)
+    GRE Eth:            0 (  0.000%)
+   GRE VLAN:            0 (  0.000%)
+    GRE IP4:            0 (  0.000%)
+    GRE IP6:            0 (  0.000%)
+GRE IP6 Ext:            0 (  0.000%)
+   GRE PPTP:            0 (  0.000%)
+    GRE ARP:            0 (  0.000%)
+    GRE IPX:            0 (  0.000%)
+   GRE Loop:            0 (  0.000%)
+       MPLS:            0 (  0.000%)
+        ARP:            2 (  4.255%)
+        IPX:            0 (  0.000%)
+   Eth Loop:            0 (  0.000%)
+   Eth Disc:            0 (  0.000%)
+   IP4 Disc:            0 (  0.000%)
+   IP6 Disc:            0 (  0.000%)
+   TCP Disc:            0 (  0.000%)
+   UDP Disc:            0 (  0.000%)
+  ICMP Disc:            0 (  0.000%)
+All Discard:            0 (  0.000%)
+      Other:            0 (  0.000%)
+Bad Chk Sum:           22 ( 46.809%)
+    Bad TTL:            0 (  0.000%)
+     S5 G 1:            0 (  0.000%)
+     S5 G 2:            0 (  0.000%)
+      Total:           47
+===============================================================================
+Action Stats:
+     Alerts:            2 (  4.255%)
+     Logged:            2 (  4.255%)
+     Passed:            0 (  0.000%)
+Limits:
+      Match:            0
+      Queue:            0
+        Log:            0
+      Event:            0
+      Alert:            0
+Verdicts:
+      Allow:           47 ( 94.000%)
+      Block:            0 (  0.000%)
+    Replace:            0 (  0.000%)
+  Whitelist:            0 (  0.000%)
+  Blacklist:            0 (  0.000%)
+     Ignore:            0 (  0.000%)
+      Retry:            0 (  0.000%)
+===============================================================================
+Snort exiting
+```
+
+Première partie: nous permet de savoir le temps d'exécution, le nombre de paquets traité ainsi que le nombre de paquet traité par seconde.
+
+Deuxième partie: nous fournit un résumé de l'usage de la mémoire.
+
+Troisième partie: nous donne des informations supplémentaires sur les paquets. Dans notre cas, nous avons reçus 50 paquets. 47 ont été analysés et 3 sont restés en suspens. Aucun n'a été filtré ou écarté.
+
+Quatrième partie: nous montre les paquets selon leurs protocoles.
+
+Cinquième partie: nous montre les statistiques du traitement. Nous voyons que nous avons reçu deux alertes qui ont été loguées. 47 paquets ont été autorisés.
+
 ---
 
 
@@ -416,6 +628,24 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 ---
 
 **Réponse :**  
+
+```
+[**] [1:4000015:1] NeverSSL vu! [**]
+[Priority: 0] 
+04/15-14:55:04.546792 13.224.89.198:80 -> 192.168.1.3:60290
+TCP TTL:62 TOS:0x0 ID:31135 IpLen:20 DgmLen:1460
+***AP*** Seq: 0x389849E3  Ack: 0x54C7133B  Win: 0xFFFF  TcpLen: 20
+```
+
+La ligne`[**] [1:4000015:1] NeverSSL vu! [**]` identifie la règle. On y voit le SID, le numéro de révision ainsi que le message défini dans notre règle d'alerte.
+
+La ligne `[Priority: 0]` indique la priorité de la règle. Elle est par défaut à 0.
+
+La ligne `04/15-14:55:04.546792 13.224.89.198:80 -> 192.168.1.3:60290` indique la date et l'heure de l'alerte ainsi que l'adresse IP et port source et l'adresse IP et port de destination.
+
+La ligne `TCP TTL:62 TOS:0x0 ID:31135 IpLen:20 DgmLen:1460` fournit les informations de l'entête du paquet IP. On y retrouve le protocole (TCP), le time to live (TTL), le type of service (TOS), l'ID du paquet (ID), la taille de l'entête du paquet (IpLen) et la taille du paquet (DgmLen).
+
+La ligne `***AP*** Seq: 0x389849E3  Ack: 0x54C7133B  Win: 0xFFFF  TcpLen: 20` fournit les informations de l'entête du segment TCP. On y retrouve le numéro de séquence (Seq), le numéro d'acquittement (Ack), la taille de la fenêtre (Win) et la taille de l'entête (TcpLen).
 
 ---
 
@@ -431,6 +661,14 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 ---
 
 **Réponse :**  
+
+```
+log tcp 192.168.1.3/24 any -> 91.198.174.192 [80,443] (msg:"Wikipedia visited!"; sid:4000004; rev:1;)
+```
+
+Le message a été journalisé dans le répertoire `var/log/snort` dans le fichier `snort.log.1618502759`. 
+
+Ce sont les paquets TCP à destination de wikipedia.org qui ont été journalisé.
 
 ---
 
