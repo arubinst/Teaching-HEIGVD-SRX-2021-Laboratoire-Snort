@@ -160,7 +160,7 @@ snort -v -i eth0
 
 Snort s'éxecute donc et montre sur l'écran tous les entêtes des paquets IP qui traversent l'interface eth0. Cette interface reçoit tout le trafic en provenance de la machine "Client" puisque nous avons configuré le IDS comme la passerelle par défaut.
 
-Pour arrêter Snort, il suffit d'utiliser `CTRL-C` (**attention** : il peut arriver de temps à autres que Snort ne réponde pas correctement au signal d'arrêt. Dans ce cas-là, il faudra utiliser `kill` depuis un deuxième terminal pour arrêter le process).
+Pour arrêter Snort, il suffit d'utiliser `CTRL-C` (**attention** : il peut arriver de temps à autres que Snort ne réponde pas correctement au signal d'arrêt. Dans ce cas-là, il faudra utiliser `kill` ou **CTRL-Z** depuis un deuxième terminal pour arrêter le process).
 
 ## Utilisation comme un IDS
 
@@ -188,7 +188,6 @@ snort -c /etc/snort/mysnort.conf
 
 Vous pouvez maintenant faire quelques pings depuis votre "Client" et regarder les résultas dans le fichier d'alertes contenu dans le repertoire `/var/log/snort/`.
 
-
 ## Ecriture de règles
 
 Snort permet l'écriture de règles qui décrivent des tentatives de exploitation de vulnérabilités bien connues. Les règles Snort prennent en charge à la fois, l'analyse de protocoles et la recherche et identification de contenu.
@@ -204,6 +203,8 @@ L'option contient des messages d'alerte et de l'information concernant les parti
 
 ```
 alert tcp any any -> 192.168.1.0/24 111 (content:"|00 01 86 a5|"; msg: "mountd access";)
+
+[alert|log|pass|drop|reject|sdrop] [ICMP|TCP|UDP] src_ip srcport -> dist_ip dist_port (rules option)
 ```
 
 Cette règle décrit une alerte générée quand Snort trouve un paquet avec tous les attributs suivants :
@@ -250,7 +251,7 @@ Le premier champ dans le règle c'est l'action. L'action dit à Snort ce qui doi
 * alert - générer une alerte et écrire le paquet dans le journal
 * log - écrire le paquet dans le journal
 * pass - ignorer le paquet
-* drop - bloquer le paquet et l'ajouter au journal
+* drop - bloquer le paquet silencieusement et l'ajouter au journal
 * reject - bloquer le paquet, l'ajouter au journal et envoyer un `TCP reset` si le protocole est TCP ou un `ICMP port unreachable` si le protocole est UDP
 * sdrop - bloquer le paquet sans écriture dans le journal
 
@@ -346,7 +347,11 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Ils permettent d'étendre les fonctionnalités de snort en permettant aux utilisateurs d'ajouter des plugins à Snort facilement.
+
+Il sont exécutés avant le lancement du moteur de détection et après le décodage du paquet. 
+
+Source : http://manual-snort-org.s3-website-us-east-1.amazonaws.com/node17.html
 
 ---
 
@@ -354,11 +359,9 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Lors de l'analyse de paquets, Snort essaie de lancer des préprocesseurs mais n'en trouve aucun. Ce message n'empêche cependant pas d'effectuer une analyse. 
 
 ---
-
---
 
 ### Trouver du contenu :
 
@@ -370,7 +373,9 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  
+**Réponse :**  Cette règle génère une alerte lorsqu'un paquet du protocole TCP provenant de n'importe quelle IP ou port source et à destination de n'importe quelle IP ou port, contient la chaîne de caractère "Rubinstein". Le message d'alerte sera "Mon nom !" à chaque fois qu'un paquet génèrera cette alerte. 
+
+Le *sid* est l'identifiant unique de la règle et le *rev:1* correspond à la version de la règle.
 
 ---
 
@@ -386,6 +391,12 @@ sudo snort -c myrules.rules -i eth0
 
 **Réponse :**  
 
+![Q4](images/Q4.PNG)
+
+Les 2 premières lignes initialisent les plugins et préprocesseurs, ensuite il détecte les options de la règle et des informations la concernant (pattern, nombre de règles, interfaces capturées, ...).
+
+Pour terminer, il donne des informations sur Snort (par ex : no° de version) puis il commence la capture.
+
 ---
 
 Aller à un site web contenant dans son text la phrase ou le mot clé que vous avez choisi (il faudra chercher un peu pour trouver un site en http... Si vous n'y arrivez pas, vous pouvez utiliser [http://neverssl.com](http://neverssl.com) et modifier votre votre règle pour détecter un morceau de text contenu dans le site).
@@ -394,7 +405,7 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ---
 
-**Réponse :**  
+**Réponse :**  Etant donné que la résolution DNS ne fonctionne pas sur le docker donné, il nous est impossible de répondre à la question. 
 
 ---
 
@@ -405,6 +416,28 @@ Arrêter Snort avec `CTRL-C`.
 ---
 
 **Réponse :**  
+
+Les informations suivantes sont affichées : 
+
+* Le temps total de sniffing par Snort
+
+* Le nombre de paquets traités par minutes et secondes
+
+* L'utilisation de la mémoire
+
+* Le nombre de paquets reçus et traités
+
+* La liste des différents protocoles reconnus par Snort et le nombre de paquets traités par protocole
+
+* La liste du nombre d'actions prises par Snort (Alerts, Logged, Passed)
+
+* Les limites atteintes durant le sniffing
+
+* Les verdicts attribués pour chaque paquet (accepté, bloqué, rejeté, ingoré, ...)
+
+![Q6a](images\Q6a.PNG)
+
+![Q6b](images\Q6b.PNG)
 
 ---
 
