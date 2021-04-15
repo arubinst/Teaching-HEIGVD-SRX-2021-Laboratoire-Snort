@@ -348,6 +348,8 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 **Réponse :**  
 
+Preprocessor code is run before the detection engine is called, but after the packet has been decoded. The packet can be modified or analyzed in an out-of-band manner using this mechanism. (http://manual-snort-org.s3-website-us-east-1.amazonaws.com/node17.html). Si l'on inspecte le fichier de configuration `/etc/snort/snort.conf`, il y a beaucoup de configurations qui ont à voir avec la normalisation de plusieurs protocoles tels ipv4, ipv6, icmpv4, icmpv6, tcp, etc.
+
 ---
 
 **Question 2: Pourquoi êtes vous confronté au WARNING suivant `"No preprocessors configured for policy 0"` lorsque vous exécutez la commande `snort` avec un fichier de règles ou de configuration "fait-maison" ?**
@@ -355,6 +357,8 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 ---
 
 **Réponse :**  
+
+Car aucun preprocessor n'est chargé.
 
 ---
 
@@ -371,6 +375,8 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 ---
 
 **Réponse :**  
+
+Afficher une alerte et journalise tout segment TCP de n'importe quelle source à n'importe quelle destination dont le contenu (payload) contient la chaîne "Rubinstein". L'ID de la règle est 4000015 et c'est la première révision. Snort va regarder pour n'importe quel segment tcp si le payload contient "Rubinstein" et lève une alerte.
 
 ---
 
