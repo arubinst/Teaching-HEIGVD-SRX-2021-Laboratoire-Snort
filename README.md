@@ -377,7 +377,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 Utiliser nano pour créer un fichier `myrules.rules` sur votre répertoire home (```/root```). Rajouter une règle comme celle montrée avant mais avec votre text, phrase ou mot clé que vous aimeriez détecter. Lancer Snort avec la commande suivante :
 
 ```
-sudo snort -c myrules.rules -i eth0
+sudo  myrules.rules -i eth0
 ```
 
 **Question 4: Que voyez-vous quand le logiciel est lancé ? Qu'est-ce que tous ces messages affichés veulent dire ?**
@@ -385,6 +385,10 @@ sudo snort -c myrules.rules -i eth0
 ---
 
 **Réponse :**  
+
+![](images/02-NoProcessors.png)
+
+Dans le fichier myrules.rules, nous n'avons pas ajouté les règles pour le preprocessor donc nous optenons toujours les warning.
 
 ---
 
@@ -396,6 +400,10 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 **Réponse :**  
 
+![](images/03-Client.png)
+
+Cela nous affiche le site au format texte.
+
 ---
 
 Arrêter Snort avec `CTRL-C`.
@@ -405,6 +413,26 @@ Arrêter Snort avec `CTRL-C`.
 ---
 
 **Réponse :**  
+
+![](images/04-FinSnort1.png)
+
+Temps d'activité de snort.
+
+![05-FinSnort2](images/05-FinSnort2.png)
+
+Statistiques de la mémoire utilisée.
+
+![06-FinSnort3](images/06-FinSnort3.png)
+
+Nombre de paquets reçus.
+
+![07-FinSnort4](images/07-FinSnort4.png)
+
+Statistiques des paquets interceptés et classé par interface ou protocole.
+
+![08-FinSnort5](images/08-FinSnort5.png)
+
+Résumé de ce qu'il s'est passé.
 
 ---
 
@@ -416,6 +444,14 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 ---
 
 **Réponse :**  
+
+![](images/01-FichierAlert.png)
+
+1ère ligne: Infos de l'alerte que nous avons configuré
+
+3ème ligne: Date et heure de la requête, ainsi que ses informations sur la source et le destinataire
+
+Dernières lignes: Informations sur le paquet TCP
 
 ---
 
