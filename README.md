@@ -346,7 +346,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :** Ils peuvent être utilisés pour examiner des paquets pour une activité suspicieuse ou modifier des paquets pour que snort puisse les interpréter correctement.
 
 ---
 
@@ -354,7 +354,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Parce qu'aucun preprocessor n'a été configuré dans le fichier de configuration. Il faudrait ajouter une règle preprocessors.rules.
 
 ---
 
@@ -370,7 +370,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  
+**Réponse :**  Toutes les requêtes contenant `Rubinstein` transmises en TCP de et vers n'importe quelle adresse IP et port génèrent une alerte avec le message `Mon nom!`.
 
 ---
 
