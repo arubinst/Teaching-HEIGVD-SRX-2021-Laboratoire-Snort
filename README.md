@@ -1,5 +1,7 @@
 Pellissier David et Ruckstuhl Michael
 
+**Remarque** : nous avons dû changer le réseau Docker en 192.168.2.0 parce que le réseau 192.168.1.0 était déjà utilisé par le réseau d'un d'entre nous, causant des problèmes pour accéder à Internet.
+
 # Teaching-HEIGVD-SRX-2021-Laboratoire-Snort
 
 **Ce travail de laboratoire est à faire en équipes de 2 personnes**
@@ -340,8 +342,6 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ## Exercises
 
-**Remarque** : nous avons dû changer le réseau Docker en 192.168.2.0 parce que le réseau 192.168.1.0 était déjà utilisé par le réseau d'un d'entre nous, causant des problèmes pour accéder à Internet.
-
 **Réaliser des captures d'écran des exercices suivants et les ajouter à vos réponses.**
 
 ### Essayer de répondre à ces questions en quelques mots, en réalisant des recherches sur Internet quand nécessaire :
@@ -366,6 +366,7 @@ Source: http://manual-snort-org.s3-website-us-east-1.amazonaws.com/node17.html
 
 **Réponse :**  
 Ce message indique qu'aucun préprocesseur snort n'est chargé par le fichier de configuration.
+
 ---
 
 
