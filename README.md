@@ -377,7 +377,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 Utiliser nano pour créer un fichier `myrules.rules` sur votre répertoire home (```/root```). Rajouter une règle comme celle montrée avant mais avec votre text, phrase ou mot clé que vous aimeriez détecter. Lancer Snort avec la commande suivante :
 
 ```
-sudo  myrules.rules -i eth0
+snort -c myrules.rules -i eth0
 ```
 
 **Question 4: Que voyez-vous quand le logiciel est lancé ? Qu'est-ce que tous ces messages affichés veulent dire ?**
@@ -386,9 +386,9 @@ sudo  myrules.rules -i eth0
 
 **Réponse :**  
 
-![](images/02-NoProcessors.png)
+![](images/04.initSnort.png)
 
-Dans le fichier myrules.rules, nous n'avons pas ajouté les règles pour le preprocessor donc nous optenons toujours les warning.
+Nous voyons que Snort fait toutes ses initialisations; le préprocesseur, les plugins ainsi que les règles qu'il doit lire
 
 ---
 
@@ -402,7 +402,11 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ![](images/03-Client.png)
 
-Cela nous affiche le site au format texte.
+Cela nous affiche le site au format texte sur le client.
+
+![](images/02-NoProcessors.png)
+
+Sur la machine IDS, snort nous affiche les warnings du préprocesseur.
 
 ---
 
@@ -468,6 +472,32 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 **Réponse :**  
 
+Premièrement, afin de connaître l'adresse IP de `wikipedia.org`, on peut effectuer la commande `host -t A wikipedia.org` qui nous donne l'adresse IP du site.
+
+La règle que nous avons ajouté:
+
+````bash
+log tcp 192.168.1.3 any -> 91.198.174.192 443 (msg:"Wikipedia"; sid:4000016; rev:1;)
+````
+
+Vu que le message est de type log, le message a été journalisé dans un fichier snort.log.xxxx dans le répertoire `/var/log/snort`. Il est possible de le lire avec deux commandes différentes:
+
+```bash
+tcpdump -r snort.log.1618654353
+```
+
+![](images/09-tcpdump.png)
+
+Sinon on peut également visualiser le log avec une commande de snort:
+
+````
+snort -r snort.log.1618654353
+````
+
+![](images/10-snortR.png)
+
+Dans les deux captures, on peut voir les informations de la requête du client vers le site wikipedia.org
+
 ---
 
 --
@@ -482,8 +512,11 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
----
+````bash
+alert icmp any any -> 192.168.1.2 any (msg:"ICMP Packet"; sid:4000016; rev:3;)
+````
 
+---
 
 **Question 10: Comment avez-vous fait pour que ça identifie seulement les pings entrants ?**
 
@@ -491,23 +524,33 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+Dans la règle nous avons mis la flèche `->` qui précise que ce sont des requêtes unidirectionnelles qui vont à destination de notre machine IDS.
+
 ---
 
-
 **Question 11: Où le message a-t-il été journalisé ?**
+
+Il a été journalisé dans le fichier  `alert` et il a également été journalisé dans un fichier de log `snort.log.xx`. 
 
 ---
 
 **Réponse :**  
 
 ---
-
 
 **Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
 
 ---
 
 **Réponse :**  
+
+Dans un fichier de log:
+
+![](images/11-ping1.png)
+
+Dans le fichier alert:
+
+![](images/12-ping2.png)
 
 ---
 
@@ -522,6 +565,10 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 ---
 
 **Réponse :**  
+
+Nous avons remplacer la flèche unidirectionnelle `->` par une flèche bidirectionnelle `<>`.
+
+![](images/13-icmpreply.png)
 
 ---
 
