@@ -346,7 +346,9 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :** Ils peuvent être utilisés pour examiner des paquets pour une activité suspicieuse ou modifier des paquets pour que snort puisse les interpréter correctement.
+**Réponse :** 
+
+Ils peuvent être utilisés pour examiner des paquets pour une activité suspicieuse ou modifier des paquets pour que snort puisse les interpréter correctement. Ils vont permettre à snort d'analyser le traffic.
 
 ---
 
@@ -354,7 +356,9 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  Parce qu'aucun preprocessor n'a été configuré dans le fichier de configuration. Il faudrait ajouter une règle preprocessors.rules.
+**Réponse :**  
+
+Parce qu'aucun preprocessor n'a été configuré dans le fichier de règles. Il aurait fallu ajouter des options de préprocesseur dans le fichier `.rules` utilisé. 
 
 ---
 
@@ -370,7 +374,9 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  Toutes les requêtes contenant `Rubinstein` transmises en TCP de et vers n'importe quelle adresse IP et port génèrent une alerte avec le message `Mon nom!`.
+**Réponse :**  
+
+Toutes les requêtes contenant `Rubinstein` transmises en TCP de et vers n'importe quelle adresse IP et port génèrent une alerte avec le message `Mon nom!`.
 
 ---
 
@@ -388,7 +394,7 @@ snort -c myrules.rules -i eth0
 
 ![](images/04.initSnort.png)
 
-Nous voyons que Snort fait toutes ses initialisations; le préprocesseur, les plugins ainsi que les règles qu'il doit lire
+Nous voyons que Snort fait toutes ses initialisations; le préprocesseur, les plugins ainsi que les règles qu'il doit lire. Nous constatons que Snort a détecter une règle à lire et effectivement, dans le fichier de règles mis en paramètres, nous n'avons configuré une seule règle.
 
 ---
 
@@ -406,7 +412,7 @@ Cela nous affiche le site au format texte sur le client.
 
 ![](images/02-NoProcessors.png)
 
-Sur la machine IDS, snort nous affiche les warnings du préprocesseur.
+Sur la machine IDS, snort nous affiche les warnings du préprocesseur car nous n'avons pas ajouté les options du préprocesseur dans la règle.
 
 ---
 
@@ -428,11 +434,11 @@ Statistiques de la mémoire utilisée.
 
 ![06-FinSnort3](images/06-FinSnort3.png)
 
-Nombre de paquets reçus.
+Nombre de paquets reçus et analysés.
 
 ![07-FinSnort4](images/07-FinSnort4.png)
 
-Statistiques des paquets interceptés et classé par interface ou protocole.
+Statistiques des paquets interceptés/analysés et classé par interface ou protocole.
 
 ![08-FinSnort5](images/08-FinSnort5.png)
 
@@ -451,11 +457,9 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 ![](images/01-FichierAlert.png)
 
-1ère ligne: Infos de l'alerte que nous avons configuré
-
-3ème ligne: Date et heure de la requête, ainsi que ses informations sur la source et le destinataire
-
-Dernières lignes: Informations sur le paquet TCP
+- 1ère ligne: Infos de l'alerte que nous avons configuré
+- 3ème ligne: Date et heure de la requête, ainsi que ses informations sur la source et le destinataire
+- Dernières lignes: Informations sur le paquet TCP, par exemple la taille des données, l'id du paquet, ...
 
 ---
 
@@ -566,7 +570,7 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 **Réponse :**  
 
-Nous avons remplacer la flèche unidirectionnelle `->` par une flèche bidirectionnelle `<>`.
+Nous avons remplaceé la flèche unidirectionnelle `->` par une flèche bidirectionnelle `<>`.
 
 ![](images/13-icmpreply.png)
 
@@ -666,8 +670,11 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
----
+`fragroute` intercepte, modifie et réécrit le trafic sortant destiné à l'hôte spécifié. L'outil est souvent utilisé pour éviter les détections et les alertes des IDS/IPS et il peut également contourner des pare-feux. Il est utilisé pour aider à tester les systèmes de détection d'intrusion dans le réseau, les pare-feu et le comportement de base de la pile TCP/IP.
 
+`fragrouter` est une boîte à outils de détection d'intrusion dans le réseau. 
+
+---
 
 **Question 20: Quel est le principe de fonctionnement ?**
 
@@ -675,14 +682,21 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
----
+`fragroute` 
 
+`fragrouter` est un routeur de fragmentation à sens unique, c'est-à-dire que les paquets IP sont envoyés par l'attaquant, par exemple, au fragrouter, qui les transforme en un flux de données fragmenté pour les transmettre à la victime.
+
+---
 
 **Question 21: Qu'est-ce que le `Frag3 Preprocessor` ? A quoi ça sert et comment ça fonctionne ?**
 
 ---
 
 **Réponse :**  
+
+C'est un module de défragmentation IP utilisé avec Snort. 
+
+Il utilise des technoques d'anti-évasion par modélisation de l'hôte basées sur la cible, c'est-à-dire que l'outil va modéliser les cibles réelles sur le réseau au lieu de simplement modéliser les protocoles et de chercher des attaques dans ces protocoles.
 
 ---
 
@@ -697,6 +711,10 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 ---
 
 **Réponse :**  
+
+````bash
+alert tcp any any -> 192.168.1.2 22 (msg:"SSH Connection";flags:S;sid:4000018;rev:3;)
+````
 
 ---
 
@@ -720,11 +738,12 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
+Snort n'a pas intercepté la commande nmap; il n'y a aucune alerte dans le fichiers de logs.
+
 ---
 
 
 Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocessor` et refaire la tentative.
-
 
 **Question 24: Quel est le résultat ?**
 
@@ -732,14 +751,26 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
----
+Nous avons ajouté ces deux lignes pour initialiser le préprocesseur frag3:
 
+````bash
+preprocessor frag3_global
+preprocessor frag3_engine
+````
+
+Snort a donc pu intercepter l'alerte:
+
+![](/home/noemie/Documents/SRX/Labo_3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/14-frag3.png)
+
+---
 
 **Question 25: A quoi sert le `SSL/TLS Preprocessor` ?**
 
 ---
 
 **Réponse :**  
+
+Le préprocesseur est utilisé pour décoder le traffic SSL et TLS.
 
 ---
 
@@ -750,16 +781,19 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
+C'est un module qui permet de détecter et filter les informations personnelles sensibles, telles que les numéros de carte de crédit, les adresses mails, etc...
+
 ---
 
 ### Conclusions
-
 
 **Question 27: Donnez-nous vos conclusions et votre opinion à propos de snort**
 
 ---
 
 **Réponse :**  
+
+Snort est un outil très puissant; il permet de sécuriser un maximum un réseau à l'aide de règle. Sa mise en place est plutôt simple, les règles sont un peu plus compliquées à écrire. mais une fois tout cela mis en place, l'outil est très accessible. Ainsi nous constatons que pour une entreprise qui a besoin de mettre en place son propre IDS, il est facile d'installer Snort.
 
 ---
 
