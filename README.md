@@ -585,6 +585,12 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  
 
+````bash
+alert tcp any any -> 192.168.1.2 22 (msg:"SSH Connection";flags:S;sid:4000017;rev:3;)
+````
+
+La règle alerte toutes les adresses qui essaient de se connecter sur le port 22 (ssh) de l'IDS. Le flags `S` précise les paquets SYN.
+
 ---
 
 
@@ -593,6 +599,8 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 ---
 
 **Réponse :**  
+
+??? ca écrit pas
 
 ---
 
@@ -604,7 +612,7 @@ Depuis l'IDS, servez-vous de l'outil ```tshark```pour capturer du trafic dans un
 
 Pour lancer une capture dans un fichier, utiliser la commande suivante :
 
-```
+```bash
 tshark -w nom_fichier.pcap
 ```
 
@@ -616,6 +624,10 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 **Réponse :**  
 
+````bash
+snort -r nom_fichier.pcap
+````
+
 ---
 
 Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshark que vous venez de générer.
@@ -626,6 +638,10 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 **Réponse :**  
 
+Il l'interprète de la même manière qu'un fichier de log. Il affiche les mêmes informations que lorsqu'on la capture interface avec snort.
+
+![](/home/noemie/Documents/SRX/Labo_3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/13-pcap.png)
+
 ---
 
 **Question 18: Est-ce que des alertes sont aussi enregistrées dans le fichier d'alertes?**
@@ -633,6 +649,8 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 ---
 
 **Réponse :**  
+
+Non les alertes ne s'écrivent pas dans le fichier d'alertes.
 
 ---
 
