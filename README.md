@@ -534,7 +534,7 @@ Dans la règle nous avons mis la flèche `->` qui précise que ce sont des requ�
 
 **Question 11: Où le message a-t-il été journalisé ?**
 
-Il a été journalisé dans le fichier  `alert` et il a également été journalisé dans un fichier de log `snort.log.xx`. 
+Il a été journalisé dans le fichier  `alert` et il a également été journalisé dans un fichier de log `snort.log.xxxxxxx. 
 
 ---
 
@@ -573,6 +573,8 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 Nous avons remplaceé la flèche unidirectionnelle `->` par une flèche bidirectionnelle `<>`.
 
 ![](images/13-icmpreply.png)
+
+On peut donc remarquer le protocole icmp avec les paquets `ECHO` et `ECHO REPLY`.
 
 ---
 
@@ -642,7 +644,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 **Réponse :**  
 
-Il l'interprète de la même manière qu'un fichier de log. Il affiche les mêmes informations que lorsqu'on la capture interface avec snort.
+Il l'interprète de la même manière qu'un fichier de log. Il affiche les mêmes informations que lorsqu'on capture l'interface avec snort.
 
 ![](/home/noemie/Documents/SRX/Labo_3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/13-pcap.png)
 
@@ -654,7 +656,7 @@ Il l'interprète de la même manière qu'un fichier de log. Il affiche les même
 
 **Réponse :**  
 
-Non les alertes ne s'écrivent pas dans le fichier d'alertes.
+Oui
 
 ---
 
@@ -670,6 +672,8 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
+Les deux outils sont utilisés pour la modification du trafic pour que IDS n'arrive pas à les intercepter.
+
 `fragroute` intercepte, modifie et réécrit le trafic sortant destiné à l'hôte spécifié. L'outil est souvent utilisé pour éviter les détections et les alertes des IDS/IPS et il peut également contourner des pare-feux. Il est utilisé pour aider à tester les systèmes de détection d'intrusion dans le réseau, les pare-feu et le comportement de base de la pile TCP/IP.
 
 `fragrouter` est une boîte à outils de détection d'intrusion dans le réseau. 
@@ -682,7 +686,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
-`fragroute` 
+`fragroute` utilise un fichier de configuration `fragroute.conf` qui va définir la façon dont l'outil va interragir avec le traffic sortant IP. Il est possible par exemple de fragmenter les paquets envoyés en petits paquets ou également les dupliquer.
 
 `fragrouter` est un routeur de fragmentation à sens unique, c'est-à-dire que les paquets IP sont envoyés par l'attaquant, par exemple, au fragrouter, qui les transforme en un flux de données fragmenté pour les transmettre à la victime.
 
@@ -694,9 +698,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
-C'est un module de défragmentation IP utilisé avec Snort. 
-
-Il utilise des technoques d'anti-évasion par modélisation de l'hôte basées sur la cible, c'est-à-dire que l'outil va modéliser les cibles réelles sur le réseau au lieu de simplement modéliser les protocoles et de chercher des attaques dans ces protocoles.
+C'est un module de défragmentation IP utilisé avec Snort. L'outil va modéliser les cibles réelles sur le réseau au lieu de simplement modéliser les protocoles et de chercher des attaques dans ces protocoles. Ainsi, Snort va pouvoir sécuriser les paquets.
 
 ---
 
