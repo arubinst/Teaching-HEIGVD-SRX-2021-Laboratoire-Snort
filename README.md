@@ -484,7 +484,7 @@ La règle que nous avons ajouté:
 log tcp 192.168.1.3 any -> 91.198.174.192 443 (msg:"Wikipedia"; sid:4000016; rev:1;)
 ````
 
-Vu que le message est de type log, le message a été journalisé dans un fichier snort.log.xxxx dans le répertoire `/var/log/snort`. Il est possible de le lire avec deux commandes différentes:
+Vu que le message est de type log, le message a été journalisé dans un fichier snort.log.xxxx dans le répertoire `/var/log/snort`. Il est possible de le lire avec deux commandes différentes: 
 
 ```bash
 tcpdump -r snort.log.1618654353
