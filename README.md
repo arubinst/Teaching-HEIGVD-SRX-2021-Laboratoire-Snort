@@ -394,7 +394,7 @@ snort -c myrules.rules -i eth0
 
 ![](images/04.initSnort.png)
 
-Nous voyons que Snort fait toutes ses initialisations; le préprocesseur, les plugins ainsi que les règles qu'il doit lire. Nous constatons que Snort a détecter une règle à lire et effectivement, dans le fichier de règles mis en paramètres, nous n'avons configuré une seule règle.
+Nous voyons que Snort fait toutes ses initialisations; le préprocesseur, les plugins ainsi que les règles qu'il doit lire. Nous constatons que Snort a détecté une règle à lire et effectivement, dans le fichier de règles mis en paramètres, nous n'avons configuré une seule règle. Nous n'avons pas ajouté de règles du préprocesseur alors nous pouvons remarquer que dans l'initialisation de chaînes de règles, il n'y aucune règle de préprocesseur chargée.
 
 ---
 
@@ -408,7 +408,7 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ![](images/03-Client.png)
 
-Cela nous affiche le site au format texte sur le client.
+Cela nous affiche le site au format texte sur le client. Nous pouvons parcourir le site http en totalité, de la même manière que sur un naviguateur.
 
 ![](images/02-NoProcessors.png)
 
