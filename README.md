@@ -346,8 +346,6 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
-
 Les preprocesseurs sont des plug-in qu'on peut ajouter à Snort afin d'amener d'autres fonctionnalités pour détécter des anomalies. Les preprocesseurs gèrent les paquets avant les règles de Snort. Par exemple il existe le preprocesseur "Stream4" permettant de détécter des scans. 
 
 www.oreilly.com/library/view/snort-cookbook/0596007914/ch04.html
@@ -357,8 +355,6 @@ www.oreilly.com/library/view/snort-cookbook/0596007914/ch04.html
 **Question 2: Pourquoi êtes vous confronté au WARNING suivant `"No preprocessors configured for policy 0"` lorsque vous exécutez la commande `snort` avec un fichier de règles ou de configuration "fait-maison" ?**
 
 ---
-
-**Réponse :**  
 
 Car nous n'avons pas configurer de preprocesseurs pour notre fichier de règles ou de configuration "fait-maison".
 
@@ -376,7 +372,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  
+C'est une alerte envoyé à syslog avec le message "Mon nom!" Le message se trouve dans /var/log/snort/alerts et le paquet dans le fichier snort.log. L'alerte s'active pour le traffic tcp venant de n'importe quelle adresse et port vers n'importe quelle adresse et port également avec le contenu  "Rubinstein". Cette alerte est locale et la première version avec l'identificateur "4000015". 
 
 ---
 
@@ -390,7 +386,108 @@ sudo snort -c myrules.rules -i eth0
 
 ---
 
-**Réponse :**  
+Voici l'alerte personnalisée que je vais utiliser sur le site neverssl.com de la question 5 :
+
+alert tcp any any -> any any (msg:"Il y a le mot webiste"; content:"website"; sid:1000000; rev:1;)
+
+La première partie lorsqu'on lance le logiciel est l'initialisation. Snort regarde s'il y a des plug-ins, preprocessors et des règles. On voit qu'il a trouvé notre règle personalisée et il nous affiche le chemin du fichier où se trouveront les logs. La règle se trouve bien sur le protocole tcp.
+
+```
+Running in IDS mode
+
+        --== Initializing Snort ==--
+Initializing Output Plugins!
+Initializing Preprocessors!
+Initializing Plug-ins!
+Parsing Rules file "myrules.rules"
+Tagged Packet Limit: 256
+Log directory = /var/log/snort
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Initializing rule chains...
+1 Snort rules read
+    1 detection rules
+    0 decoder rules
+    0 preprocessor rules
+1 Option Chains linked into 1 Chain Headers
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++-------------------[Rule Port Counts]---------------------------------------
+|             tcp     udp    icmp      ip
+|     src       0       0       0       0
+|     dst       0       0       0       0
+|     any       1       0       0       0
+|      nc       0       0       0       0
+|     s+d       0       0       0       0
++----------------------------------------------------------------------------
+
+```
+
+Ensuite il y a d'autres informations sur la configuration et de comment snort opère. Snort nous dit aussi sur quel trafic il sniff. L'initialisation est terminée.
+
+
+```
+
++-----------------------[detection-filter-config]------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[detection-filter-rules]-------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[rate-filter-config]-----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[rate-filter-rules]------------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[event-filter-config]----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[event-filter-global]----------------------------------
++-----------------------[event-filter-local]-----------------------------------
+| none
++-----------------------[suppression]------------------------------------------
+| none
+-------------------------------------------------------------------------------
+
+Rule application order: pass->drop->sdrop->reject->alert->log
+Verifying Preprocessor Configurations!
+
+[ Port Based Pattern Matching Memory ]
++-[AC-BNFA Search Info Summary]------------------------------
+| Instances        : 1
+| Patterns         : 1
+| Pattern Chars    : 8
+| Num States       : 8
+| Num Match States : 1
+| Memory           :   1.62Kbytes
+|   Patterns       :   0.05K
+|   Match Lists    :   0.09K
+|   Transitions    :   1.09K
++-------------------------------------------------
+pcap DAQ configured to passive.
+Acquiring network traffic from "eth0".
+Reload thread starting...
+Reload thread started, thread 0x7f22b7f8a700 (1236)
+Decoding Ethernet
+
+        --== Initialization Complete ==--
+
+```
+
+Ensuite le sniffing commence 
+
+```
+   ,,_     -*> Snort! <*-
+  o"  )~   Version 2.9.15.1 GRE (Build 15125) 
+   ''''    By Martin Roesch & The Snort Team: http://www.snort.org/contact#team
+           Copyright (C) 2014-2019 Cisco and/or its affiliates. All rights reserved.
+           Copyright (C) 1998-2013 Sourcefire, Inc., et al.
+           Using libpcap version 1.10.0 (with TPACKET_V3)
+           Using PCRE version: 8.39 2016-06-14
+           Using ZLIB version: 1.2.11
+
+Commencing packet processing (pid=1235)
+```
 
 ---
 
