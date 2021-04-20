@@ -497,7 +497,11 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ---
 
-**Réponse :**  
+La page web s'affiche normalement. 
+
+![](./images/neverssl.png)
+
+Sur snort par contre, il y a plusieurs ligne de "WARNING: No preprocessors configured for policy 0" ce qui veut dire qu'il a sniffé le trafic.
 
 ---
 
@@ -507,7 +511,113 @@ Arrêter Snort avec `CTRL-C`.
 
 ---
 
-**Réponse :**  
+En premier lieu, il nous informe sur le temps de traitement.
+
+```
+^C*** Caught Int-Signal
+===============================================================================
+Run time for packet processing was 111.38643 seconds
+Snort processed 95 packets.
+Snort ran for 0 days 0 hours 1 minutes 51 seconds
+   Pkts/min:           95
+   Pkts/sec:            0
+
+```
+
+Ensuite de l'utilisation mémoire.
+
+```
+===============================================================================
+Memory usage summary:
+  Total non-mmapped bytes (arena):       4096000
+  Bytes in mapped regions (hblkhd):      30265344
+  Total allocated space (uordblks):      3347568
+  Total free space (fordblks):           748432
+  Topmost releasable block (keepcost):   591920
+```
+
+Puis le nombre de paquets reçu et qu'il a pu analysé ou non. On nous donne ensuite les détails par protocole du nombre de paquets reçu. Logiquement tous les paquets sniffé sont sur le protocole "Eth". On constate qu'on à plus de paquet UDP que TCP ce qui est à priori bizarre parce que http utilise TCP. Http utilise UDP pour d'autres fonctionnalités comme DNS, VOIP, NTP,... Dans la dernière partie nous montre les actions engendrées lors de l'analyse. Dans notre cas on ne demandais pas de bloquer ou de faire quoique ce soit, c'est juste une alerte donc il a tout accepté.
+
+```
+===============================================================================
+Packet I/O Totals:
+   Received:           96
+   Analyzed:           95 ( 98.958%)
+    Dropped:            0 (  0.000%)
+   Filtered:            0 (  0.000%)
+Outstanding:            1 (  1.042%)
+   Injected:            0
+===============================================================================
+Breakdown by protocol (includes rebuilt packets):
+        Eth:           95 (100.000%)
+       VLAN:            0 (  0.000%)
+        IP4:           87 ( 91.579%)
+       Frag:            0 (  0.000%)
+       ICMP:            0 (  0.000%)
+        UDP:           54 ( 56.842%)
+        TCP:           33 ( 34.737%)
+        IP6:            0 (  0.000%)
+    IP6 Ext:            0 (  0.000%)
+   IP6 Opts:            0 (  0.000%)
+      Frag6:            0 (  0.000%)
+      ICMP6:            0 (  0.000%)
+       UDP6:            0 (  0.000%)
+       TCP6:            0 (  0.000%)
+     Teredo:            0 (  0.000%)
+    ICMP-IP:            0 (  0.000%)
+    IP4/IP4:            0 (  0.000%)
+    IP4/IP6:            0 (  0.000%)
+    IP6/IP4:            0 (  0.000%)
+    IP6/IP6:            0 (  0.000%)
+        GRE:            0 (  0.000%)
+    GRE Eth:            0 (  0.000%)
+   GRE VLAN:            0 (  0.000%)
+    GRE IP4:            0 (  0.000%)
+    GRE IP6:            0 (  0.000%)
+GRE IP6 Ext:            0 (  0.000%)
+   GRE PPTP:            0 (  0.000%)
+    GRE ARP:            0 (  0.000%)
+    GRE IPX:            0 (  0.000%)
+   GRE Loop:            0 (  0.000%)
+       MPLS:            0 (  0.000%)
+        ARP:            8 (  8.421%)
+        IPX:            0 (  0.000%)
+   Eth Loop:            0 (  0.000%)
+   Eth Disc:            0 (  0.000%)
+   IP4 Disc:            0 (  0.000%)
+   IP6 Disc:            0 (  0.000%)
+   TCP Disc:            0 (  0.000%)
+   UDP Disc:            0 (  0.000%)
+  ICMP Disc:            0 (  0.000%)
+All Discard:            0 (  0.000%)
+      Other:            0 (  0.000%)
+Bad Chk Sum:           73 ( 76.842%)
+    Bad TTL:            0 (  0.000%)
+     S5 G 1:            0 (  0.000%)
+     S5 G 2:            0 (  0.000%)
+      Total:           95
+===============================================================================
+Action Stats:
+     Alerts:            0 (  0.000%)
+     Logged:            0 (  0.000%)
+     Passed:            0 (  0.000%)
+Limits:
+      Match:            0
+      Queue:            0
+        Log:            0
+      Event:            0
+      Alert:            0
+Verdicts:
+      Allow:           95 ( 98.958%)
+      Block:            0 (  0.000%)
+    Replace:            0 (  0.000%)
+  Whitelist:            0 (  0.000%)
+  Blacklist:            0 (  0.000%)
+     Ignore:            0 (  0.000%)
+      Retry:            0 (  0.000%)
+===============================================================================
+Snort exiting
+```
 
 ---
 
@@ -518,8 +628,14 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 ---
 
-**Réponse :**  
+![](./images/paquetAlert.png)
 
+Le mot qui devait activer l'alerte est le mot "website" qui a été trigger plusieurs fois (car le mot y est plusieurs fois). 
+
+* Au tout debut nous avons l'id et le vérsion de la règle avec le message qu'on voulait afficher. 
+* La deuxième ligne montre la priorité (classType) de l'alerte. 
+* La troisième affiche la date et l'heure ainsi que les adresses de départ et de destination.
+* Les lignes restantes affichent des informations sur le paquet.
 ---
 
 
