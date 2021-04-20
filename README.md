@@ -649,7 +649,12 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 ---
 
-**Réponse :**  
+**FONCIONNE PAS J?ARRIVE PAS A AVOIR LES CLASSTYPE**
+log tcp 192.168.1.3 any -> any [80,443] (msg:"Wikipedia visited"; classtype: web-application-activity; reference:url,https://en.wikipedia.org; sid:4000000; rev:1;)
+
+log tcp 192.168.1.3 any -> 91.198.174.192 [80,443] (msg:"Wikipedia visited"; sid:4000000; rev:1;)
+
+Le message est journalisé dans le fichier /var/log/snort/log.xxxxxxxx.xxx, il contiendra les paquets tcp à destination de wikipedia.org. **NE FONCTIONNE PAS, J?ARRIVE PAS A OUVRIR LA PAGE WIKIPEDIA I DONT KNOW WHY**
 
 ---
 
@@ -663,7 +668,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+alert icmp any any -> 192.168.1.2 any (itype:8; msg:"Ping received"; sid:4000001; rev:1;)
 
 ---
 
@@ -672,7 +677,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+On utilise l'option *itype:8* pour définir seulement les ping de type *echo-request*
 
 ---
 
@@ -681,7 +686,15 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+On peut le trouver dans deux fichiers différents se trouvant dans /var/log/snort/ : 
+
+* le fichier *alert*
+
+![](./images/alert1.png)
+
+* le fichier *snort.log.xxxxxxx*
+
+![](./images/log.png)
 
 ---
 
@@ -690,7 +703,9 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+Nous avons tous les paquets qui satisfons la règle que nous avons donné. Nous avons alors tous les pings reçu depuis la machine Client.
+
+![](./images/log2.png)
 
 ---
 
