@@ -346,7 +346,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Les preprocesseurs permettent de réarranger les chaines de caractères des entrées/sortes afin qu'elle puissent être détectée par l'IDS. Sans l'utilisation de ceux-ci, il serait possible de le duper en utilisant des alias. Les preprocesseurs sont donc très pertinants dans l'utilisation d'un IDS, et donc de snort.
 
 ---
 
@@ -354,7 +354,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Car il faut s'assurer que les preprocesseurs sont bien activé dans le fichier de config utilisé.
 
 ---
 
@@ -370,7 +370,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  
+**Réponse :**  Un alerte sera générée dans le cas de n'importe quelle requête tcp (peut importe la direction), avec comme descriptif "Mon nom!" si le contenu "Rubinstein" apparait dans le message. Le sid permet d'identifier de manière unique la règle, avec rev à 1, elle pourra donc pas être modifiée. Les alertes peuvent être envoyées au syslog, journalisées dans un fichier text d'alertes ou affichées directement à l'écran.
 
 ---
 
@@ -386,6 +386,92 @@ sudo snort -c myrules.rules -i eth0
 
 **Réponse :**  
 
+```
+Running in IDS mode
+
+        --== Initializing Snort ==--
+Initializing Output Plugins!
+Initializing Preprocessors!
+Initializing Plug-ins!
+Parsing Rules file "myrules.rules"
+Tagged Packet Limit: 256
+Log directory = /var/log/snort
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Initializing rule chains...
+1 Snort rules read
+    1 detection rules
+    0 decoder rules
+    0 preprocessor rules
+1 Option Chains linked into 1 Chain Headers
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++-------------------[Rule Port Counts]---------------------------------------
+|             tcp     udp    icmp      ip
+|     src       0       0       0       0
+|     dst       0       0       0       0
+|     any       1       0       0       0
+|      nc       0       0       0       0
+|     s+d       0       0       0       0
++----------------------------------------------------------------------------
+
++-----------------------[detection-filter-config]------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[detection-filter-rules]-------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[rate-filter-config]-----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[rate-filter-rules]------------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[event-filter-config]----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[event-filter-global]----------------------------------
++-----------------------[event-filter-local]-----------------------------------
+| none
++-----------------------[suppression]------------------------------------------
+| none
+-------------------------------------------------------------------------------
+Rule application order: pass->drop->sdrop->reject->alert->log
+Verifying Preprocessor Configurations!
+
+[ Port Based Pattern Matching Memory ]
++-[AC-BNFA Search Info Summary]------------------------------
+| Instances        : 1
+| Patterns         : 1
+| Pattern Chars    : 5
+| Num States       : 5
+| Num Match States : 1
+| Memory           :   1.56Kbytes
+|   Patterns       :   0.04K
+|   Match Lists    :   0.07K
+|   Transitions    :   1.05K
++-------------------------------------------------
+pcap DAQ configured to passive.
+Acquiring network traffic from "eth0".
+Reload thread starting...
+Reload thread started, thread 0x7f24587d4700 (1189)
+Decoding Ethernet
+
+        --== Initialization Complete ==--
+
+   ,,_     -*> Snort! <*-
+  o"  )~   Version 2.9.15.1 GRE (Build 15125)
+   ''''    By Martin Roesch & The Snort Team: http://www.snort.org/contact#team
+           Copyright (C) 2014-2019 Cisco and/or its affiliates. All rights reserved.
+           Copyright (C) 1998-2013 Sourcefire, Inc., et al.
+           Using libpcap version 1.10.0 (with TPACKET_V3)
+           Using PCRE version: 8.39 2016-06-14
+           Using ZLIB version: 1.2.11
+
+Commencing packet processing (pid=1188)
+```
+
+Au début, on voit l'initialisation de snort, avec ces service et ses règles, et ensuite il lance l'analyse des paquets. On peut donc voir ci-dessus qu'un rège de détection a été chargée, que la règle concerne tous les ports tcp, et que tout s'est bien initialisé.
+
 ---
 
 Aller à un site web contenant dans son text la phrase ou le mot clé que vous avez choisi (il faudra chercher un peu pour trouver un site en http... Si vous n'y arrivez pas, vous pouvez utiliser [http://neverssl.com](http://neverssl.com) et modifier votre votre règle pour détecter un morceau de text contenu dans le site).
@@ -394,7 +480,9 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ---
 
-**Réponse :**  
+**Réponse :**  http://www.nukmed.insel.ch/de/ueber-uns/unser-team/klinikleitung/prof-dr-med-axel-rominger/
+
+WARNING: No preprocessors configured for policy 0. Il a pu identifier le contenu concerné.
 
 ---
 
