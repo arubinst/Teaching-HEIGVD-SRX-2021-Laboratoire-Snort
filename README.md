@@ -646,7 +646,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 Il l'interprète de la même manière qu'un fichier de log. Il affiche les mêmes informations que lorsqu'on capture l'interface avec snort.
 
-![](/home/noemie/Documents/SRX/Labo_3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/13-pcap.png)
+![](images/13-pcap.png)
 
 ---
 
@@ -762,7 +762,7 @@ preprocessor frag3_engine
 
 Snort a donc pu intercepter l'alerte:
 
-![](/home/noemie/Documents/SRX/Labo_3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/14-frag3.png)
+![](images/14-frag3.png)
 
 ---
 
