@@ -461,7 +461,7 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 Dans `/var/log/snort/snort.log.XXXXXXXXXXXXX
 
-Le log est un fichier .pcap
+Le log est un fichier au format pcap
 
 ---
 
