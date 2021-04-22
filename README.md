@@ -608,7 +608,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  A effectuer des attaques sur un réseau avec un NIDS
+**Réponse :**  A effectuer des attaques sur un réseau avec un NIDS/IDS
 
 ---
 
