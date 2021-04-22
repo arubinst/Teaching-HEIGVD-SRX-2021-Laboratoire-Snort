@@ -533,9 +533,9 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  `alert tcp 192.168.10.3 any -> 192.168.10.2 22 (flags: S;msg:"SSH"; sid:4000003; rev:1;)`
 
-On crée une alerte lorsqu'une paquet provenant de la machine client vers l'IPS sur le port 22 est détecte.
+On crée une alerte lorsqu'un paquet provenant de la machine client vers l'IPS sur le port 22 est détecte.
 
-(On a pas réussi à reproduire le comportement. Les alertes ne fonctionnent plus avec cette commande)
+(On a pas réussi à reproduire le comportement. Les alertes ne fonctionnent lorsque l'on utilise ssh)
 
 ---
 
