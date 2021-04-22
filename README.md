@@ -358,7 +358,7 @@ Preprocessor code is run before the detection engine is called, but after the pa
 
 **Réponse :**  
 
-Car aucun preprocessor n'est chargé.
+Car aucun preprocessor n'est chargé pour le fichier de règle en cours.
 
 ---
 
@@ -547,7 +547,9 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  
 
-`alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"SSH from Client to IDS"; sid:4000018; rev:1;)`
+Après avoir eu des soucis pour intercepter la tentative de connexion SSH, j'ai finalement réussi en faisant tourner le serveur SSH sur un autre port (7822) :
+
+`alert tcp 192.168.1.3 any -> 192.168.1.2 7822 (msg:"SSH from Client to IDS"; sid:4000018; rev:1;)`
 
 ---
 
@@ -557,6 +559,8 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 ---
 
 **Réponse :**  
+
+![](images/Q14.jpg)
 
 ---
 
@@ -580,6 +584,8 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 **Réponse :**  
 
+`snort -r <file>` => Read a single pcap.
+
 ---
 
 Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshark que vous venez de générer.
@@ -590,6 +596,10 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 **Réponse :**  
 
+L'analyse temps réel ne semble pas afficher le détail du trafic directement dans la console. Avec l'analyse ultérieure utilisant `snort -r`, on obtient la même output qu'en temps réel mais avec le détail pour chaque trafic intercepté :
+
+![](images/Q17.jpg)
+
 ---
 
 **Question 18: Est-ce que des alertes sont aussi enregistrées dans le fichier d'alertes?**
@@ -597,6 +607,8 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 ---
 
 **Réponse :**  
+
+En utilisant tshark, tout le trafic est enregistré dans le fichier `.pcap`, il n'y a pas d'alertes dans un autre fichier.
 
 ---
 
@@ -612,6 +624,12 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
+Les deux sont des outils de pentest.
+
+- `fragroute` :  intercepts, modifies, and rewrites egress traffic destined for a specified host
+
+- `fragrouter` : a network intrusion detection evasion toolkit
+
 ---
 
 
@@ -621,6 +639,10 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
+- `fragroute` : It features a simple ruleset language to delay, duplicate, drop, fragment, overlap, print, reorder, segment, source-route, or otherwise monkey with all outbound packets destined for a target host
+
+- `fragrouter` : fragrouter is just a one-way fragmenting router – IP packets get sent from the attacker to the fragrouter, which transforms them into a fragmented data stream to forward to the victim.
+
 ---
 
 
@@ -629,6 +651,8 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 ---
 
 **Réponse :**  
+
+The `frag3 preprocessor` is a target-based IP defragmentation module for Snort.  The attacker can determine what style of IP defragmentation being used on a particular target, the attacker can try to fragment packets such that the target will put them back together in a specific manner. Ce module se met en place en activant au moins 2 directives préproceseur.
 
 ---
 
@@ -643,6 +667,8 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 ---
 
 **Réponse :**  
+
+`alert tcp any any -> 192.168.1.2 22 (msg:"SYN sur le port 22"; flags:S; sid:4000031; rev:1)` 
 
 ---
 
@@ -666,6 +692,12 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
+Sans fragmenter, Snort arrive bien à alerter :
+
+![](images/Q22.jpg)
+
+En utilisant la version fragmentée, Snort n'arrive pas à alerter. On peut donc bien contourner l'IDS.
+
 ---
 
 
@@ -678,6 +710,16 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
+Contenu du `myrules.rules` :
+
+```
+preprocessor frag3_global
+preprocessor frag3_engine
+alert tcp any any -> 192.168.1.2 22 (msg:"SYN sur le port 22"; flags:S; sid:4000031; rev:1)
+```
+
+Désormais, même en fragmentant l'attaque, Snort le détectera et il ne sera donc pas possible de le contourner de cette manière.
+
 ---
 
 
@@ -687,14 +729,17 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
----
+The SSL Dynamic Preprocessor (SSLPP) decodes SSL and TLS traffic and optionally determines if and when Snort should stop inspection of it. 
 
+---
 
 **Question 26: A quoi sert le `Sensitive Data Preprocessor` ?**
 
 ---
 
 **Réponse :**  
+
+The Sensitive Data preprocessor is a Snort module that performs detection and filtering of Personally Identifiable Information (PII). This information includes credit card numbers, U.S. Social Security numbers, and email addresses.
 
 ---
 
@@ -706,6 +751,8 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 ---
 
 **Réponse :**  
+
+Snort semble être un outil très puissant et capable de détecter des intrusions avec un granularité très fine. La courbe d'apprentissage est assez élevée et demande  beaucoup de tests afin de vérifier que les règles écrites fonctionnent comme prévu. Snort requiert de lire attentivement la documentation car l'absence de certains paramètres (Frag3 Preprocessor) permet à des attaquants de contourner l'IDS assez aisément.
 
 ---
 
