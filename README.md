@@ -391,6 +391,9 @@ sudo snort -c myrules.rules -i eth0
 ---
 
 **Réponse :**  
+Les messages indique les étapes d'initialisaiton de Snort, il commence (entre autres) par parser le fichier de rules puis vérifie la configuration des Preprocessor, il acquiert le traffic sur l'interface eth0 et lance le processus qui va se charger de sniffer.
+
+![](images/Q4.jpg)
 
 ---
 
@@ -401,6 +404,9 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 ---
 
 **Réponse :**  
+J'ai effectué la requête avec wget :
+
+![](images/Q5.jpg)
 
 ---
 
@@ -412,6 +418,14 @@ Arrêter Snort avec `CTRL-C`.
 
 **Réponse :**  
 
+Snort affiche ses statistiques d'utilisation : temps d'exécution, nb de paquets traités nb de paquets par minutes, etc.
+
+Il affiche ensuite ses statistiques d'utilisation mémoire, puis des statistiques plus avancées sur les paquets entrants/sortants (paquets reçus, rejetés, filtrés, etc).
+
+Ensuite on a un résumé par protocole (couche transport et application).
+
+![](images/Q6.jpg)
+
 ---
 
 
@@ -422,6 +436,14 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 ---
 
 **Réponse :**  
+
+![](images/Q7.jpg)
+
+- La première ligne nous informe de l'id de l'alerte levée avec le message qui avait été configuré dans le .rules. 
+- La seconde ligne nous informe d'une certaine priorité.
+- La troisième ligne nous indique la date/heure de l'alerte et de l'ip/port source de source et de destination. On voit qu'il y a 2 alertes, car comme on a configuré l'IDS comme passerelle par défaut du Client, Snort a détecté le paquet qui arrivait dans l'IDS et le paquet qui était redirigé au Client.
+- La quatrième ligne nous montre le protocole transport utilisé et les valeurs des différents champs IP : le TTL, l'en-tête IP Type of Service (TOS), l'ID du fragment IP, le nb. de bytes des en-têtes IP (20), et la taille total du datagramme (1460B)
+- La cinquième ligne nous donne des informations sur le protocole de transport utilisé : no de séquence, no d'ACK, taille de fenêtre
 
 ---
 
@@ -437,6 +459,13 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 ---
 
 **Réponse :**  
+En faisant un `nslookup wikipedia.org`, on obtient l'adresse IP 91.198.174.192.
+
+On peut donc écrire une règle comme ceci : `log tcp 192.168.1.3 any -> 91.198.174.192 any (sid:4000017; rev:1;)`
+
+Le contenu journalisé est le suivant :
+
+![](images/Q8.jpg)
 
 ---
 
@@ -452,6 +481,8 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+`alert icmp any any -> 192.168.1.2 any (msg:"Pinged IDS"; itype:8; sid:4000017; rev:1;)`
+
 ---
 
 
@@ -460,6 +491,8 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 ---
 
 **Réponse :**  
+
+On veut détecter que les echo request (ICMP type 8), car si l'on détecte également les echo reply, notre règle se déclencherait aussi pour les pings depuis l'IDS. 
 
 ---
 
@@ -470,6 +503,8 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+`/var/log/snort.log.1619100046`
+
 ---
 
 
@@ -478,6 +513,8 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 ---
 
 **Réponse :**  
+
+![](images/Q12.jpg)
 
 ---
 
@@ -493,6 +530,8 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 **Réponse :**  
 
+On peut modifier l'opérateur `->` en `<>` pour que la règle précédente soit valide dans les deux sens.
+
 ---
 
 
@@ -507,6 +546,8 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 ---
 
 **Réponse :**  
+
+`alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"SSH from Client to IDS"; sid:4000018; rev:1;)`
 
 ---
 
