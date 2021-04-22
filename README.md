@@ -1,4 +1,12 @@
+
+
 # Teaching-HEIGVD-SRX-2021-Laboratoire-Snort
+
+###### Ryan Sauge & Dylan Canton
+
+###### 22.04.2021
+
+---
 
 **Ce travail de laboratoire est à faire en équipes de 2 personnes**
 
@@ -30,11 +38,9 @@ Clonez le repo sur votre machine. Vous pouvez répondre aux questions en modifia
 
 [Cleanup](#cleanup)
 
-
-## Echéance 
+### Échéance
 
 Ce travail devra être rendu au plus tard, **le 29 avril 2021 à 23h59.**
-
 
 ## Introduction
 
@@ -160,7 +166,7 @@ snort -v -i eth0
 
 Snort s'éxecute donc et montre sur l'écran tous les entêtes des paquets IP qui traversent l'interface eth0. Cette interface reçoit tout le trafic en provenance de la machine "Client" puisque nous avons configuré le IDS comme la passerelle par défaut.
 
-Pour arrêter Snort, il suffit d'utiliser `CTRL-C` (**attention** : il peut arriver de temps à autres que Snort ne réponde pas correctement au signal d'arrêt. Dans ce cas-là, il faudra utiliser `kill` ou **CTRL-Z** depuis un deuxième terminal pour arrêter le process).
+Pour arrêter Snort, il suffit d'utiliser `CTRL-C` (**attention** : il peut arriver de temps à autres que Snort ne réponde pas correctement au signal d'arrêt. Dans ce cas-là, il faudra utiliser `kill` ou `CTRL-Z` depuis un deuxième terminal pour arrêter le process).
 
 ## Utilisation comme un IDS
 
@@ -385,17 +391,27 @@ Utiliser nano pour créer un fichier `myrules.rules` sur votre répertoire home 
 sudo snort -c myrules.rules -i eth0
 ```
 
+
+
+Notre règle : 
+
+```
+alert tcp any any -> any any (msg:"SSL manquant"; content:"SSL"; sid:4000015; rev:1;)
+```
+
 **Question 4: Que voyez-vous quand le logiciel est lancé ? Qu'est-ce que tous ces messages affichés veulent dire ?**
 
 ---
 
 **Réponse :**  
 
-![Q4](images/Q4.PNG)
-
 Les 2 premières lignes initialisent les plugins et préprocesseurs, ensuite il détecte les options de la règle et des informations la concernant (pattern, nombre de règles, interfaces capturées, ...).
 
 Pour terminer, il donne des informations sur Snort (par ex : no° de version) puis il commence la capture.
+
+![Q4](images/Q4.PNG)
+
+
 
 ---
 
@@ -405,7 +421,9 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ---
 
-**Réponse :**  Etant donné que la résolution DNS ne fonctionne pas sur le docker donné, il nous est impossible de répondre à la question. 
+**Réponse :**  Rien de spécial n'est affiché hormis le warning concernant les préprocesseurs.
+
+![Q5](images\Q5.PNG)
 
 ---
 
@@ -448,12 +466,25 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 ---
 
-**Réponse :**  
+**Réponse :** 
+
+Une alerte est affichée sous forme de bloc de textes contenant plusieurs informations : 
+
+* Tout d'abord nous acons 3 nombres au format [a: b : c] qui sont :
+  * a : ID du générateur, indiquant le composant Snort qui a généré l'alerte.
+  * b : le SID (4000015) de la règle
+  * c : ID de révision
+* Suivis du message de l'alerte ("SSL manquant") que nous avons configuré précédemment. 
+* La priorité du paquet traité. 
+* La date et l'heure de l'interception du paquet, suivis de l'adresse IP de destination et l'adresse IP source.
+* Le type de paquet (ici TCP) ainsi que différents en-têtes IP du paquet : Time-To-Leave, TOS, ID, IpLen (longueur de l'en-tête), DmgLen (longueur du datagramme).
+* Pour finir, nous avons différents en-têtes TCP : Seq (Séquence de nombre), Ack (état), Win (taille de la fenêtre) , TcpLen (longueur de l'entête TCP).
+
+![Q7](images\Q7.PNG)
 
 ---
 
 
---
 
 ### Detecter une visite à Wikipedia
 
@@ -465,9 +496,23 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 **Réponse :**  
 
----
+Notre règle (`91.198.174.192` étant l'adresse IPv4 de *wikipedia.org*) : 
 
---
+```
+log tcp 192.168.1.3 any -> 91.198.174.192 any (msg:"Visit Wikipedia"; sid:4000016; rev:1;)
+```
+
+
+
+Le message est journalisé dans le fichier`/var/log/snort/alert`
+
+![Q8](images\Q8.PNG)
+
+
+
+Le contenu du log contient tous les paquets échangés qui ont été interceptés par Snort durant le sniffing (donc qui correspondent à notre règle).
+
+---
 
 ### Détecter un ping d'un autre système
 
@@ -479,6 +524,14 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+Notre règle : 
+
+Par "vers un autre système", nous comprenons que cela peut également être un ping de l'IDS vers lui-même.
+
+```
+alert icmp !192.168.1.2 any -> 192.168.1.2 any (itype: 8; msg:"ICMP ping"; sid:4000017; rev:1;)
+```
+
 ---
 
 
@@ -488,6 +541,10 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+Notre règle ne tient compte que des pings n'ayant pas notre IDS comme IP source  et à destination de notre IDS uniquement.
+
+Nous utilisons également l'option `itypes: 8` pour spécifier le type de requête ICMP (ici une ECHO Request). 
+
 ---
 
 
@@ -495,20 +552,27 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+**Réponse :**  Dans le fichier `/var/log/snort/alert`
 
 ---
-
 
 **Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
 
 ---
 
-**Réponse :**  
+**Réponse :**  Les pings entrant à destination de l'IDS :
+
+![Q11](images\Q11.PNG)
+
+
+
+Lecture des logs : 
+
+![Q11b](images\Q11b.PNG)
 
 ---
 
---
+
 
 ### Detecter les ping dans les deux sens
 
@@ -518,14 +582,15 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 ---
 
-**Réponse :**  
+**Réponse :**  Il suffit de modifier le sens du traffic, on remplace `->` par `<>` .
+
+```
+alert icmp !192.168.1.2 any <> 192.168.1.2 any (itype: 8; msg:"ICMP ping"; sid:4000017; rev:1;)
+```
 
 ---
 
-
---
-
-### Detecter une tentative de login SSH
+### Détecter une tentative de login SSH
 
 Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été faite depuis la machine Client sur l'IDS.
 
@@ -535,8 +600,15 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  
 
----
+Notre règle : 
 
+```
+alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"Tentative login SSH"; sid:4000018; rev:1;)
+```
+
+Cette règle déclenche une alerte pour tout paquet envoyé depuis l'adresse IP `192.168.1.3` (Notre machine cliente) de n'importe quel port à destination de notre IDS sur le port 22. 
+
+---
 
 **Question 15: Montrer le message enregistré dans le fichier d'alertes.** 
 
@@ -544,9 +616,9 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  
 
----
+![Q15](images\Q15.PNG)
 
---
+---
 
 ### Analyse de logs
 
@@ -564,7 +636,7 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 ---
 
-**Réponse :**  
+**Réponse :**  L'option est `-r` . 
 
 ---
 
@@ -574,7 +646,15 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Snort montre, comme avec l'analyse en temps réel, les informations des alertes générées :
+
+![Q17a](images\Q17a.PNG)
+
+
+
+La différence est qu'il montre ici également la liste des protocoles supportés par Snort ainsi que le nombre de ceux-ci traités. 
+
+![Q17b](images\Q17b.PNG)
 
 ---
 
@@ -582,11 +662,9 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Non car nous avons ici capturer le traffic avec Wireshark, Snort s'est juste contenté de lire le fichier de capture pcap avec l'option `-r`. Snort écrit dans le fichier d'alertes quand il capture lui-même en temps réel le traffic. 
 
 ---
-
---
 
 ### Contournement de la détection
 
@@ -598,6 +676,16 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
+* **fragroute** : il permet intercepter, modifier et réécrire le trafic de sortie destiné à un hôte. 
+
+  Source : https://tools.kali.org/information-gathering/fragroute 
+
+  
+
+* **fragrouter** : C'est un outil de détection d'intrusion. Il implémente plusieurs attaques décrites dans  le document *`Insertion, Evasion, and Denial of Service: Eluding Network Intrusion Detection`* publié en 1998. 
+
+  Source : https://tools.kali.org/information-gathering/fragrouter
+
 ---
 
 
@@ -607,14 +695,18 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
----
+* **fragroute** : La commande fragroute se lance en spécifiant un fichier de configuration ainsi qu'une adresse IP de destination. Les paquets envoyés vers l'IP de destination vont alors subir des modifications configurées au préalable dans le fichier de configuration.
+* **fragrouter : ** La commande fragrouter s'utilise en spécifiant une interface pour recevoir les paquets ainsi que la manière dont on veut que les paquets soient fragmentés. 
 
+---
 
 **Question 21: Qu'est-ce que le `Frag3 Preprocessor` ? A quoi ça sert et comment ça fonctionne ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**  C'est un module de défragmentation basé sur une cible IP pour snort. Lors de l'implémentation de la couche IP (stack) , il peut y avoir des différences entre les différents systèmes car la RFC n'est pas suffisamment détaillée. Certains outils comme *fragroute* permet d'exploiter ces faiblesses de fragmentation IP pour contourner les IDS. Frag3 permet empêcher cela car les paquets sont réassemblés selon la cible. 
+
+Source :  https://www.snort.org/faq/readme-frag3
 
 ---
 
@@ -629,6 +721,10 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 ---
 
 **Réponse :**  
+
+```
+alert tcp any any -> 192.168.1.2 22 (flags: S;msg: "SYN scan detection";sid:4000019; rev:1;)
+```
 
 ---
 
@@ -652,6 +748,14 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
+Tout d'abord, on peut voir que la règle marche pour les paquets non fragmentés : 
+
+![Q23](images\Q23.PNG)
+
+
+
+Lors d'une attaque fragmentée, aucune alerte concernant le SYN scan ne se produit.
+
 ---
 
 
@@ -662,7 +766,18 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  Après avoir configuré le préprocesseur en ajoutant frag3 à notre fichier de règles :  
+
+```
+preprocessor frag3_global:
+preprocessor frag3_engine:
+```
+
+
+
+Nous pouvons maintenant voir qu'une alerte est levée lors d'une tentative de SYN scan fragmenté, ce qui n'était pas le cas avant : 
+
+![Q24](images\Q24.PNG)
 
 ---
 
@@ -671,16 +786,19 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  Par défaut, snort ignore le trafic chiffré pour des raisons de performances. Ce pré-processeur permet d'inspecter le trafic SSL/TLS.
+
+Source : https://www.snort.org/faq/readme-ssl
 
 ---
-
 
 **Question 26: A quoi sert le `Sensitive Data Preprocessor` ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**  C'est un module snort qui effectue la détection et le filtrage d'informations personnellement identifiables(PII). Par exemple : numéro de carte de crédits ou de sécurité social, adresse email. 
+
+Source : https://www.snort.org/faq/readme-sensitive_data
 
 ---
 
@@ -691,7 +809,9 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  Snort est un outil complet proposant de nombreuses fonctionnalités pour la détection d'attaques et offre une grande liberté à l'utilisateur dans la configuration des règles.
+
+L'utilisateur devra néanmoins veiller à configurer correctement snort, sinon il risque d'y avoir des failles dans son réseau. Il est cependant, dans certains cas, difficile de modéliser une règle voulue et d'obtenir le résultat exacte. 
 
 ---
 
