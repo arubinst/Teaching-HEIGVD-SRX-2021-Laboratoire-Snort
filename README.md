@@ -663,7 +663,7 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 **Réponse :**  
 
 ```
-log tcp 192.168.1.3/24 any -> 91.198.174.192 [80,443] (msg:"Wikipedia visited!"; sid:4000004; rev:1;)
+log tcp 192.168.1.3 any -> 91.198.174.192 [80,443] (msg:"Wikipedia visited!"; sid:4000004; rev:1;)
 ```
 
 Le message a été journalisé dans le répertoire `var/log/snort` dans le fichier `snort.log.1618502759`. 
@@ -684,6 +684,10 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+```
+alert icmp any any -> 192.168.1.2 any (msg:"Ping received!";itype:8;sid:4000005;rev:1;)
+```
+
 ---
 
 
@@ -692,6 +696,8 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 ---
 
 **Réponse :**  
+
+En utilisant l'option `itype:8` permettant de traiter uniquement les echo request. La règle ne s'appliquera pas sur les réponses des pings.
 
 ---
 
@@ -702,14 +708,21 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
----
+Dans `/var/log/snort/alert`
 
+![image-20210422142647481](/images/image-20210422142647481.png)
+
+---
 
 **Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
 
 ---
 
 **Réponse :**  
+
+Les pings echo request (dans ce cas en provenance de la machine Client vers l'IDS) ont été journalisé dans le fichier log.
+
+![image-20210422142935215](/images/image-20210422142935215.png)
 
 ---
 
@@ -725,8 +738,13 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 **Réponse :**  
 
----
+```
+alert icmp any any <> 192.168.1.2 any (msg:"Ping received!";sid:4000006;rev:1;)
+```
 
+Nous avons modifié l'opérateur de direction pour que les deux sens soient compris. De plus, nous avons supprimé l'option `itype:8` pour que les echo request et echo response soient prises en compte.
+
+---
 
 --
 
@@ -740,14 +758,21 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  
 
----
+```
+alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"Attempting SSH connection from Client";flags:S;sid:4000007;rev:1;)
+```
 
+Sachant que le protocole SSH utilise le port TCP 22, on alerte si une tentative de connexion depuis le client (192.168.1.3) avec n'importe quel port vers l'IDS (192.168.1.2) sur le port 22 tente d'être établie (le flag `S` vérifie qu'il y a eu un SYN 
+
+---
 
 **Question 15: Montrer le message enregistré dans le fichier d'alertes.** 
 
 ---
 
 **Réponse :**  
+
+TODO
 
 ---
 
@@ -771,6 +796,8 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 **Réponse :**  
 
+L'option `-r`.
+
 ---
 
 Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshark que vous venez de générer.
@@ -781,6 +808,8 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 **Réponse :**  
 
+On redirige l'analyse du trafic dans un fichier pcap où les règles seront appliquées. On lit ensuite le fichier pcap avec Snort qui va afficher les informations. Il n'y a donc pas de différence entre la lecture d'un fichier de capture et l'analyse en temps réel.
+
 ---
 
 **Question 18: Est-ce que des alertes sont aussi enregistrées dans le fichier d'alertes?**
@@ -788,6 +817,8 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 ---
 
 **Réponse :**  
+
+TODO
 
 ---
 
@@ -803,6 +834,10 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
+fragroute permet d'intercepter, de modifier et de réécrire le trafic de sortie destiné à un hôte spécifique.
+
+fragrouter est une boîte à outils d'évasion de détection d'intrusion dans le réseau.
+
 ---
 
 
@@ -812,6 +847,8 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
+On définit des règles dans un fichier de configuration qui permettent notamment de retarder, dupliquer, refuser et segmenter les paquets sortant destiné à un hôte spécifique.
+
 ---
 
 
@@ -820,6 +857,16 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 ---
 
 **Réponse :**  
+
+Le préprocesseur frag3 est un module de défragmentation IP basé sur les cibles pour Snort. Frag3 est conçu avec les objectifs suivants :
+
+1) Une exécution plus rapide avec une gestion des données moins complexe.
+
+2) Techniques anti-évasion de modélisation de l'hôte basées sur la cible.
+
+Frag3 utilise la structure de données sfxhash et les listes liées pour la gestion des données en interne, ce qui lui permet d'avoir des performances beaucoup plus prévisibles et déterministes dans n'importe quel environnement, ce qui devrait nous aider à gérer les environnements fortement fragmentés.
+
+Lien:  https://www.snort.org/faq/readme-frag3 
 
 ---
 
@@ -834,6 +881,12 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 ---
 
 **Réponse :**  
+
+```
+alert tcp any any -> 192.168.1.2 22 (msg:"SYN detection";flags:S;sid:4000008;rev:1;)
+```
+
+
 
 ---
 
@@ -857,6 +910,16 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
+Résultat de `nmap -sS -p 22 192.168.1.2`:
+
+![image-20210422160159170](/images/image-20210422160159170.png)
+
+L'alerte a été journalisée.
+
+Résultat de `nmap -sS -f -p 22 --send-eth 192.168.1.2`:
+
+L'alerte n'a pas été journalisée. On a pu contourner la détection grâce à la fragmentation.
+
 ---
 
 
@@ -869,6 +932,10 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
+L'alerte est cette fois-ci journalisée avec la commande `nmap -sS -f -p 22 --send-eth 192.168.1.2` car le préprocesseur permet de défragmenter le message.
+
+![image-20210422161142680](/images/image-20210422161142680.png)
+
 ---
 
 
@@ -878,6 +945,8 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
+Le SSL/TLS préprocesseur permet d'ignorer le trafic chiffré pour des raisons de performances et pour réduire les faux positifs.
+
 ---
 
 
@@ -886,6 +955,8 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 ---
 
 **Réponse :**  
+
+Le Sensitive Data préprocesseur est un module Snort qui effectue la détection et le filtrage des informations personnelles identifiables. Comme par exemple, les numéros de carte de crédit, les numéros de sécurité sociale (États-Unis) et les adresses mails. On peut également définir nos propres informations personnelles identifiables.
 
 ---
 
