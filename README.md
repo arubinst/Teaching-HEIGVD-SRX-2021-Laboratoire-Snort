@@ -456,6 +456,8 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 **Réponse :**  ` log tcp 192.168.10.3 any <> 91.198.174.192 any (sid:4000015; rev:1;)` 
 
+91.198.174.192 est l'ip résolu par le client pour wikipedia.
+
 Dans `/var/log/snort/snort.log.XXXXXXXXXXXXX
 
 Le paquet IP dans un fichier .pcap
@@ -473,8 +475,6 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 ---
 
 **Réponse :**  `alert icmp any any -> 192.168.10.2 any (msg:"ICMP Packet";itype:8; sid:4000001; rev:3;)`
-
-192.168.10.2 est l'ip résolu par le client pour wikipedia.
 
 ---
 
@@ -608,7 +608,6 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-
 **Question 20: Quel est le principe de fonctionnement ?**
 
 ---
@@ -621,11 +620,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  Un preprocessor pour snort qui vise à empêcher les attaques par paquets fragmentés. 
-
-# PAR MAGIE
-
-
+**Réponse :**  Un preprocessor pour snort qui vise à empêcher les attaques par paquets fragmentés. Frag3 permet à snort de mieux gérer les paquets fragmentés, pour mieux analyser les paquets et améliorer les performances.[^1]
 
 ---
 
@@ -639,7 +634,7 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 
 ---
 
-**Réponse :**  
+**Réponse :**  alert tcp any any -> 192.168.10.2 22 (flags: S;msg:"NMAP SYN scan"; sid:4000008; rev:1;)
 
 ---
 
@@ -647,7 +642,7 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 Ensuite, servez-vous du logiciel nmap pour lancer un SYN scan sur le port 22 depuis la machine Client :
 
 ```
-nmap -sS -p 22 192.168.1.2
+nmap -sS -p 22 192.168.10.2
 ```
 Vérifiez que votre règle fonctionne correctement pour détecter cette tentative. 
 
@@ -661,7 +656,7 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 ---
 
-**Réponse :**  
+**Réponse :** Snort ne detecte pas le scan
 
 ---
 
@@ -673,7 +668,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  JE NE SAIS PAS PLUS RIEN NE FONCTIONNE
 
 ---
 
@@ -682,7 +677,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  A améliorer les performances de snort en observant uniquement le handshake (les données étant encryptés, on ne peut faire d'analyse utile dessus). Il permet également de vérifier que le handshake n'a pas été crafté pour évader snort et que le traffic est bien encrypté.
 
 ---
 
@@ -691,7 +686,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  A faire de la détection et du filtrage d'information personnelles d'identification (numéro de carte de crédit, email, etc) 
 
 ---
 
@@ -702,7 +697,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  Le réseau me deteste et c'est réciproque donc je pense que snort c'est très bien mais pas fait pour moi.
 
 ---
 
@@ -710,5 +705,6 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 Pour nettoyer votre système et effacer les fichiers générés par Docker, vous pouvez exécuter le script [cleanup.sh](scripts/cleanup.sh). **ATTENTION : l'effet de cette commande est irréversible***.
 
-
 <sub>This guide draws heavily on http://cs.mvnu.edu/twiki/bin/view/Main/CisLab82014</sub>
+
+[^1]:https://snort.org/faq/readme-frag3
