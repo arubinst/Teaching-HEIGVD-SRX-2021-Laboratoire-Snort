@@ -389,7 +389,7 @@ sudo snort -c myrules.rules -i eth0
 
 ---
 
-**Réponse :**  Les paramètres de configurations de snort, avec une compte de toutes les règles actives par protocoles concernés
+**Réponse :**  L'initialisation de snort, les paramètres de configurations, un comptage de toutes les règles actives par protocoles concernés et finalement le logo avec les copyrights avant d'afficher le début de l'analyse de paquet.
 ![Q4](./images/Q4.png)
 
 ---
