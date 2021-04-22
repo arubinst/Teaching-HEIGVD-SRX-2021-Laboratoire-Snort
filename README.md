@@ -346,7 +346,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  Modules utilisateurs qui peuvent ajouter des fonctionnalités, notamment afin de pouvoir décoder des paquets pour que snort puisse les traiter.
+**Réponse :**  Modules utilisateurs qui peuvent ajouter des fonctionnalités , notamment afin de pouvoir décoder des paquets pour que snort puisse les traiter.
 
 ---
 
@@ -389,7 +389,8 @@ sudo snort -c myrules.rules -i eth0
 
 ---
 
-**Réponse :**  Les paramètres de configurations de snort, avec une compte de toutes les règles actives par protocoles concernés![Q4](./images/Q4.png)
+**Réponse :**  Les paramètres de configurations de snort, avec une compte de toutes les règles actives par protocoles concernés
+![Q4](./images/Q4.png)
 
 ---
 
