@@ -608,7 +608,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  A effectuer des attaques sur un réseau avec un NIDS/IDS
+**Réponse :**  A effectuer des attaques sur un réseau avec un NIDS/IDS.
 
 ---
 
@@ -616,7 +616,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  Utiliser des packets fragmenté pour éviter la détection
+**Réponse :**  Utiliser des packets fragmenté pour éviter la détection.
 
 ---
 
