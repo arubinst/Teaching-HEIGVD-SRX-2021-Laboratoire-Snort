@@ -423,7 +423,7 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 **Réponse :**  Rien de spécial n'est affiché hormis le warning concernant les préprocesseurs.
 
-![Q5](images\Q5.PNG)
+![Q5](images/Q5.PNG)
 
 ---
 
@@ -453,9 +453,9 @@ Les informations suivantes sont affichées :
 
 * Les verdicts attribués pour chaque paquet (accepté, bloqué, rejeté, ingoré, ...)
 
-![Q6a](images\Q6a.PNG)
+![Q6a](images/Q6a.PNG)
 
-![Q6b](images\Q6b.PNG)
+![Q6b](images/Q6b.PNG)
 
 ---
 
@@ -480,7 +480,7 @@ Une alerte est affichée sous forme de bloc de textes contenant plusieurs inform
 * Le type de paquet (ici TCP) ainsi que différents en-têtes IP du paquet : Time-To-Leave, TOS, ID, IpLen (longueur de l'en-tête), DmgLen (longueur du datagramme).
 * Pour finir, nous avons différents en-têtes TCP : Seq (Séquence de nombre), Ack (état), Win (taille de la fenêtre) , TcpLen (longueur de l'entête TCP).
 
-![Q7](images\Q7.PNG)
+![Q7](images/Q7.PNG)
 
 ---
 
@@ -506,7 +506,7 @@ log tcp 192.168.1.3 any -> 91.198.174.192 any (msg:"Visit Wikipedia"; sid:400001
 
 Le message est journalisé dans le fichier`/var/log/snort/alert`
 
-![Q8](images\Q8.PNG)
+![Q8](images/Q8.PNG)
 
 
 
@@ -562,17 +562,15 @@ Nous utilisons également l'option `itypes: 8` pour spécifier le type de requê
 
 **Réponse :**  Les pings entrant à destination de l'IDS :
 
-![Q11](images\Q11.PNG)
+![Q11](images/Q11.PNG)
 
 
 
 Lecture des logs : 
 
-![Q11b](images\Q11b.PNG)
+![Q11b](images/Q11b.PNG)
 
 ---
-
-
 
 ### Detecter les ping dans les deux sens
 
@@ -616,7 +614,7 @@ Cette règle déclenche une alerte pour tout paquet envoyé depuis l'adresse IP 
 
 **Réponse :**  
 
-![Q15](images\Q15.PNG)
+![Q15](images/Q15.PNG)
 
 ---
 
@@ -648,13 +646,13 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 **Réponse :**  Snort montre, comme avec l'analyse en temps réel, les informations des alertes générées :
 
-![Q17a](images\Q17a.PNG)
+![Q17a](images/Q17a.PNG)
 
 
 
 La différence est qu'il montre ici également la liste des protocoles supportés par Snort ainsi que le nombre de ceux-ci traités. 
 
-![Q17b](images\Q17b.PNG)
+![Q17b](images/Q17b.PNG)
 
 ---
 
@@ -750,7 +748,7 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 Tout d'abord, on peut voir que la règle marche pour les paquets non fragmentés : 
 
-![Q23](images\Q23.PNG)
+![Q23](images/Q23.PNG)
 
 
 
@@ -777,7 +775,7 @@ preprocessor frag3_engine:
 
 Nous pouvons maintenant voir qu'une alerte est levée lors d'une tentative de SYN scan fragmenté, ce qui n'était pas le cas avant : 
 
-![Q24](images\Q24.PNG)
+![Q24](images/Q24.PNG)
 
 ---
 
