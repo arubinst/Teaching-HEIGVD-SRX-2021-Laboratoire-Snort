@@ -586,7 +586,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  Il va analyser chaque paquet et appliquer les règles si fournies. A part l'initialisation, il s'agit du même fonctionnement
+**Réponse :**  Il va analyser chaque paquet et appliquer les règles si fournies. A part l'initialisation, il s'agit du même fonctionnement.
 
 ---
 
