@@ -755,13 +755,6 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
-Le code à ajouter dans le fichier de règles est le suivant:
-
-```conf
-preprocessor frag3_global
-preprocessor frag3_engine
-```
-
 Avec un SYN scan fragmenté, il n'y a pas d'alerte ![preuve](images/23.png))
 
 ---
@@ -775,6 +768,13 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 ---
 
 **Réponse :**  
+
+Le code à ajouter dans le fichier de règles est le suivant:
+
+```conf
+preprocessor frag3_global
+preprocessor frag3_engine
+```
 
 L'alerte a bien lieu car les paquets sont défragmentés ![](images/24.png)
 
