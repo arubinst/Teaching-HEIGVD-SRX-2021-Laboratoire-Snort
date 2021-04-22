@@ -606,7 +606,7 @@ La règle alerte toutes les adresses qui essaient de se connecter sur le port 22
 
 **Réponse :**  
 
-??? ca écrit pas
+![](/home/noemie/Documents/SRX/Labo_3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/15-SSH_14.png)
 
 ---
 
@@ -776,7 +776,6 @@ Le préprocesseur est utilisé pour décoder le traffic SSL et TLS.
 
 ---
 
-
 **Question 26: A quoi sert le `Sensitive Data Preprocessor` ?**
 
 ---
@@ -795,7 +794,7 @@ C'est un module qui permet de détecter et filter les informations personnelles 
 
 **Réponse :**  
 
-Snort est un outil très puissant; il permet de sécuriser un maximum un réseau à l'aide de règle. Sa mise en place est plutôt simple, les règles sont un peu plus compliquées à écrire. mais une fois tout cela mis en place, l'outil est très accessible. Ainsi nous constatons que pour une entreprise qui a besoin de mettre en place son propre IDS, il est facile d'installer Snort.
+Snort est un outil très puissant; il permet de sécuriser au maximum un réseau à l'aide de règles. Sa mise en place est plutôt simple, les règles sont un peu plus compliquées à écrire. Mais une fois tout cela mis en place, l'outil est très accessible. Ainsi nous constatons que pour une entreprise qui a besoin de mettre en place son propre IDS, il est facile d'installer Snort.
 
 ---
 
