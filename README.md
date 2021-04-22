@@ -556,7 +556,7 @@ Nous utilisons également l'option `itypes: 8` pour spécifier le type de requê
 
 ---
 
-**Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
+**Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log`**
 
 ---
 
