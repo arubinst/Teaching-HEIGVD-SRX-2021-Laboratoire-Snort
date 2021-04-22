@@ -418,7 +418,7 @@ Arrêter Snort avec `CTRL-C`.
 - Statistique des paquets par protocole
 - Statistique des actions entreprises (Nombre de paquet)
 
-![Q6](/home/leonard/Documents/BA4/SRX/Labo3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/Q6.png)
+![Q6](./images/Q6.png)
 
 ---
 
