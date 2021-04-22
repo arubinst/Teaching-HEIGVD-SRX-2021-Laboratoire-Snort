@@ -728,8 +728,22 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 **Réponse :**  
 
----
+```
+alert icmp any any <> 192.168.1.2 any (itype:8; msg:"Ping recu"; sid:4000022; rev:1;)
+```
 
+On modifie la règle pour qu'elle fonctionne dans les deux sens en mettant l'opérateur de direction <>
+
+Exemple de messages journalisés :
+
+```
+ 3   2.024484  192.168.1.3 ? 192.168.1.2  ICMP 98 Echo (ping) request  id=0x8e80, seq=3/768, ttl=64
+    4   2.422598  192.168.1.2 ? 192.168.1.3  ICMP 98 Echo (ping) request  id=0xc5a6, seq=1/256, ttl=64
+```
+
+
+
+---
 
 --
 
@@ -743,14 +757,27 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  
 
----
+```
+alert tcp 192.168.1.2 22 -> 192.168.1.3 any (msg:"Login ssh"; sid:4000023; rev:1;)
+```
 
+Nous créons une alerte tcp car c'est le protocole utilisé pour SSH depuis l'adresse IP de notre machine client à destination de l'adresse IP de l'IDS où nous précisions le port 22 qui correspond à SSH.
+
+---
 
 **Question 15: Montrer le message enregistré dans le fichier d'alertes.** 
 
 ---
 
 **Réponse :**  
+
+```
+[**] [1:4000023:1] Login ssh [**]
+[Priority: 0]
+04/22-12:46:56.924945 192.168.1.2:22 -> 192.168.1.3:37196
+TCP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:40 DF
+***A*R** Seq: 0x0  Ack: 0xA8376E6D  Win: 0x0  TcpLen: 20
+```
 
 ---
 
@@ -772,7 +799,7 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 ---
 
-**Réponse :**  
+**Réponse :**  snort -r nom_fichier.pcap
 
 ---
 
@@ -782,7 +809,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Il n'y a pas de différence par rapport à l'analyse en temps réel.
 
 ---
 
@@ -790,7 +817,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Non, snort lit simplement le fichier Wireshark, mais n'applique pas ses règles.
 
 ---
 
@@ -804,7 +831,9 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+**Réponse :**  fragroute intercepte, modifie et réécrit le trafic de sortie destiné à un hôte spécifié.
+
+fragrouter est un programme permettant d'acheminer le trafic réseau de manière à échapper à la plupart des systèmes de détection des intrusions dans le réseau.
 
 ---
 
@@ -813,16 +842,15 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+**Réponse :**  Ils fragmentent les paquets à différents niveaux protocolaire, pour échapper au systèmes de détection d'intrusion.
 
 ---
-
 
 **Question 21: Qu'est-ce que le `Frag3 Preprocessor` ? A quoi ça sert et comment ça fonctionne ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**  C'est un module de défragmentation IP basé sur les cibles. L'idée d'un système basé sur les cibles est de modéliser les cibles réelles sur le réseau au lieu de se contenter de modéliser les protocoles et de rechercher les attaques dans ces derniers.
 
 ---
 
@@ -837,6 +865,10 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 ---
 
 **Réponse :**  
+
+```
+alert tcp 192.168.1.3 any -> 192.168.1.2 22 (flags: S; msg:"SYN scan detected"; sid:4000024; rev:1;)
+```
 
 ---
 
@@ -858,7 +890,7 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 ---
 
-**Réponse :**  
+**Réponse :**  L'IDS n'a pas détecter la tentative.
 
 ---
 
@@ -870,16 +902,24 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  La tentative fonctionne de nouveau.
+
+```
+[**] [1:4000024:1] SYN scan detected [**]
+[Priority: 0]
+04/22-13:58:15.828934 192.168.1.3:35499 -> 192.168.1.2:22
+TCP TTL:38 TOS:0x0 ID:39873 IpLen:20 DgmLen:44
+******S* Seq: 0x1DF31EED  Ack: 0x0  Win: 0x400  TcpLen: 24
+TCP Options (1) => MSS: 1460
+```
 
 ---
-
 
 **Question 25: A quoi sert le `SSL/TLS Preprocessor` ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**  Inspecte le trafic SSL et TLS et détermine optionnellement si et quand arrêter l'inspection de celui-ci.
 
 ---
 
@@ -888,7 +928,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  Effectue la détection et le filtrage des informations personnellement identifiables. Ces informations comprennent les numéros de carte de crédit, les numéros de sécurité sociale des États-Unis et les adresses électroniques.
 
 ---
 
@@ -899,7 +939,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  C'est un outil très puissant, mais complexe à utiliser. Nous trouvons qu'il y a un petit manque de documentation. :laughing:
 
 ---
 
