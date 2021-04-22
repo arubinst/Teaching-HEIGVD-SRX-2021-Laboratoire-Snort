@@ -638,7 +638,7 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 
 ---
 
-**Réponse :**  alert tcp any any -> 192.168.10.2 22 (flags: S;msg:"NMAP SYN scan"; sid:4000008; rev:1;)
+**Réponse :**  `alert tcp any any -> 192.168.10.2 22 (flags: S;msg:"NMAP SYN scan"; sid:4000008; rev:1;)`
 
 ---
 
