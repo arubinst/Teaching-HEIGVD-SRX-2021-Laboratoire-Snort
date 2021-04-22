@@ -432,10 +432,10 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 **Réponse :**  
 
 ```
-[**] [1:4000016:1] Malediction [**] 								## Entete: SID:Revision: Message name
-[Priority: 0] 													    ## Priorité du paquet
-04/15-14:26:46.124980 13.225.25.13:80 -> 192.168.10.3:43494			## Timestamps source -> destination
-TCP TTL:240 TOS:0x0 ID:27166 IpLen:20 DgmLen:1480					## Protocol IP Headers
+[**] [1:4000016:1] Malediction [**] 					                    ## Entete: SID:Revision: Message name
+[Priority: 0] 													                          ## Priorité du paquet
+04/15-14:26:46.124980 13.225.25.13:80 -> 192.168.10.3:43494			  ## Timestamps source -> destination
+TCP TTL:240 TOS:0x0 ID:27166 IpLen:20 DgmLen:1480					        ## Protocol IP Headers
 ***A**** Seq: 0xF23B8378  Ack: 0x85835865  Win: 0x80  TcpLen: 32	## More Headers
 TCP Options (3) => NOP NOP TS: 2640528150 4253956880
 ```
@@ -461,7 +461,7 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 Dans `/var/log/snort/snort.log.XXXXXXXXXXXXX
 
-Le paquet IP dans un fichier .pcap
+Le log est un fichir .pcap
 
 ---
 
