@@ -653,7 +653,7 @@ Vérifiez que votre règle fonctionne correctement pour détecter cette tentativ
 Ensuite, modifiez votre commande nmap pour fragmenter l'attaque :
 
 ```
-nmap -sS -f -p 22 --send-eth 192.168.1.2
+nmap -sS -f -p 22 --send-eth 192.168.10.2
 ```
 
 **Question 23: Quel est le résultat de votre tentative ?**
