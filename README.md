@@ -606,7 +606,7 @@ La règle alerte toutes les adresses qui essaient de se connecter sur le port 22
 
 **Réponse :**  
 
-![](/home/noemie/Documents/SRX/Labo_3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/15-SSH_14.png)
+![](images/15-SSH_14.png)
 
 ---
 
