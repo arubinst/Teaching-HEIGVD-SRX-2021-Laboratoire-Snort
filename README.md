@@ -689,7 +689,7 @@ alert tcp any any -> 192.168.10.2 22 (flags: S;msg:"NMAP SYN scan"; sid:4000008;
 
 ---
 
-**Réponse :**  A améliorer les performances de snort en observant uniquement le handshake (les données étant encryptés, on ne peut faire d'analyse utile dessus). Il permet également de vérifier que le handshake n'a pas été crafté pour échapper à snort et que le traffic est bien encrypté.
+**Réponse :**  A améliorer les performances de snort en observant uniquement le handshake (les données étant encryptées, on ne peut faire d'analyse utile dessus). Il permet également de vérifier que le handshake n'a pas été crafté pour échapper à snort et que le traffic est bien encrypté.
 
 ---
 
