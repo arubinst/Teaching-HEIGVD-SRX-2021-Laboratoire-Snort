@@ -346,7 +346,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  Modules utilisateurs qui peuvent ajouter des fonctionnalités , notamment afin de pouvoir décoder des paquets pour que snort puisse les traiter.
+**Réponse :**  Modules utilisateurs qui peuvent ajouter des fonctionnalités, notamment afin de pouvoir décoder des paquets pour que snort puisse les traiter.
 
 ---
 
