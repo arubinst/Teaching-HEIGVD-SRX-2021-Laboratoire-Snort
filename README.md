@@ -708,7 +708,7 @@ alert tcp any any -> 192.168.10.2 22 (flags: S;msg:"NMAP SYN scan"; sid:4000008;
 
 ---
 
-**Réponse :**  Le réseau me deteste et c'est réciproque donc je pense que snort c'est très bien mais pas fait pour moi.
+**Réponse :**  Nous recherchons toujours le moyen de lever notre malédiction relative aux réseaux. Sur un autre registre, snort est un logiciel très complet et complexe mais qui parait extrêmement performant.
 
 ---
 
