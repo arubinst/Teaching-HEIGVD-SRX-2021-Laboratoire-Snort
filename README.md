@@ -694,7 +694,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 **Réponse :**  
 
 * **fragroute** : La commande fragroute se lance en spécifiant un fichier de configuration ainsi qu'une adresse IP de destination. Les paquets envoyés vers l'IP de destination vont alors subir des modifications configurées au préalable dans le fichier de configuration.
-* **fragrouter : ** La commande fragrouter s'utilise en spécifiant une interface pour recevoir les paquets ainsi que la manière dont on veut que les paquets soient fragmentés. 
+* **fragrouter :** La commande fragrouter s'utilise en spécifiant une interface pour recevoir les paquets ainsi que la manière dont on veut que les paquets soient fragmentés. 
 
 ---
 
