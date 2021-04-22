@@ -495,14 +495,13 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-
 **Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
 
 ---
 
 **Réponse :**  ```0.000000 192.168.10.3 ? 192.168.10.2 ICMP 98 Echo (ping) request  id=0x58f1, seq=1/256, ttl=64```
 
-![Q12](/home/leonard/Documents/BA4/SRX/Labo3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/Q12.png)
+![Q12](./images/Q12.png)
 
 ---
 
@@ -672,16 +671,24 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  JE NE SAIS PAS PLUS RIEN NE FONCTIONNE
+**Réponse :**  La règle fonctionne à nouveau
+
+```
+preprocessor frag3_global
+preprocessor frag3_engine
+
+alert tcp any any -> 192.168.10.2 22 (flags: S;msg:"NMAP SYN scan"; sid:4000008; rev:1;)
+```
+
+![Q24](./images/Q24.png)
 
 ---
-
 
 **Question 25: A quoi sert le `SSL/TLS Preprocessor` ?**
 
 ---
 
-**Réponse :**  A améliorer les performances de snort en observant uniquement le handshake (les données étant encryptés, on ne peut faire d'analyse utile dessus). Il permet également de vérifier que le handshake n'a pas été crafté pour évader snort et que le traffic est bien encrypté.
+**Réponse :**  A améliorer les performances de snort en observant uniquement le handshake (les données étant encryptés, on ne peut faire d'analyse utile dessus). Il permet également de vérifier que le handshake n'a pas été crafté pour échapper à snort et que le traffic est bien encrypté.
 
 ---
 
