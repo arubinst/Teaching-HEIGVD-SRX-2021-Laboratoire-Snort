@@ -616,7 +616,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  Utiliser des packets fragmenté pour éviter la détection.
+**Réponse :**  Utiliser des paquets fragmentés pour éviter la détection.
 
 ---
 
