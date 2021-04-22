@@ -348,7 +348,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  Ils permettent d'étendre la fonctionnalité de Snort en permettant aux utilisateurs et aux programmeurs d'y intégrer assez facilement des plugins modulaires. Le code du préprocesseur est exécuté avant l'appel du moteur de détection (L'IDS dans le cadre de ce laboratoire), mais après le décodage du paquet. Grâce à ce mécanisme, le paquet peut être modifié ou analysé de manière hors bande.
+**Réponse :**  Ils permettent d'étendre la fonctionnalité de Snort en donnant la possibilité aux utilisateurs et aux développeurs d'y intégrer assez facilement des plugins modulaires. Le code du préprocesseur est exécuté avant l'appel du moteur de détection (L'IDS dans le cadre de ce laboratoire), mais après le décodage du paquet. Grâce à ce mécanisme, le paquet peut être modifié ou analysé de manière hors bande.
 
 Par exemple, certains préprocesseurs permettent d'examiner des paquets qui tentent d'échapper au système de détection. (*Frag3* qui est un module de défragmentation "target-based").
 
@@ -466,7 +466,7 @@ Reload thread started, thread 0x7feeaedd5700 (1309)
 Decoding Ethernet
 ```
 
-Cette partie indique qu'une rule de détection a été trouvée et indique aussi diverses informations concernant la configuration notamment l'interface sur laquelle le trafic est écouté.
+Cette partie indique qu'une rule de détection a été trouvée et indique aussi diverses informations concernant la configuration, notamment l'interface sur laquelle le trafic est écouté.
 ```
         --== Initialization Complete ==--
 
@@ -619,7 +619,7 @@ TCP TTL:37 TOS:0x0 ID:59647 IpLen:20 DgmLen:918
 ***AP*** Seq: 0x1AFE3218  Ack: 0xC5B23C93  Win: 0xFFFF  TcpLen: 20
 ```
 
-On ne le voit pas directement dans les alertes mais le mot-clé choisi était "CERN" et le site utilisé était info.cern.ch
+On ne le voit pas dans les alertes mais le mot-clé choisi était "CERN" et le site utilisé était info.cern.ch
 
 La première ligne nous indique le message que nous voulions afficher dans l'alerte lors de la configuration de la règle.
 La seconde ligne représente la catégorie (classType) pouvant être utilisée pour définir la sévérité.
@@ -727,7 +727,7 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Réponse :**  `alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"SSH Connection detected";content:"SSH-";nocase;sid:4000017;rev:1;)`
+**Réponse :**  `alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"SSH Connection detected"; content:"SSH-"; nocase; sid:4000017; rev:1;)`
 
 Elle permet de détecter des connexions venant de la machine client, peu importe le port source, sur l'IDS via le port 22 (SSH). Elle affiche une alerte contenant le message "SSH Connection detected" si le contenu du paquet contient la string "SSH-" en minuscule ou en majuscule (option `nocase`).  Concernant le contenu du paquet, après quelques recherches, les paquets de connexion possèdent la version de SSH employée (par exemple SSH-2.0) d'où l'ajout de l'option `content` dans la règle.
 
@@ -738,7 +738,7 @@ Elle permet de détecter des connexions venant de la machine client, peu importe
 
 ---
 
-**Réponse :**  Bizarrement Snort ne met rien dans le fichier *alert* et crée aussi un fichier snort.log.xxxxxxxxxx. Même en ayant tester Snort sur une VM Kali dans le cas où le problème viendrait du WSL, même résultat... Discussion sur Teams avec M. Rubinstein concernant ce problème.
+**Réponse :**  Bizarrement Snort ne met rien dans le fichier *alert* et crée un fichier snort.log.xxxxxxxxxx vide. Même en ayant tester Snort sur une VM Kali dans le cas où le problème viendrait du WSL, même résultat... Discussion sur Teams avec M. Rubinstein concernant ce problème.
 
 ---
 
@@ -760,7 +760,7 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 ---
 
-**Réponse :**  C'est l'option `-r` qui permet de renseigner des fichiers pcap ou log.
+**Réponse :**  C'est l'option `-r` qui permet de renseigner des fichiers pcap ou log en plus de l'option `-c` avec le fichier de rules.
 
 ---
 
@@ -770,7 +770,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  Il n'y a pas vraiment de différence sauf que là lorsqu'il a fini de lire le fichier de capture, il s'arrête, alors que lors d'une analyse en temps réel, c'est à nous de l'arrêter.
+**Réponse :**  Il n'y a pas vraiment de différence, il démarre de la même manière et lit le fichier de capture. Sauf que là lorsqu'il a fini de le lire, il s'arrête. Alors que lors d'une analyse en temps réel, c'est à nous de l'arrêter.
 
 ---
 
@@ -778,7 +778,9 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  Même problème que pour la détection de login SSH, les fichiers sont créés mais restent vides. Même en ayant tester Snort sur une VM Kali dans le cas où le problème viendrait du WSL, même résultat... Discussion sur Teams avec M. Rubinstein concernant ce problème.
+**Réponse :**  Oui le résultat dans le fichier *alert* ne diffère pas du résultat que l'on obtient avec une analyse temps-réel.
+
+![image-20210422145752825](img/image-20210422145752825.png)
 
 ---
 
@@ -904,7 +906,7 @@ TCP Options (1) => MSS: 1460
 
 ---
 
-**Réponse :**  Il permet la détection et le filtrage de données sensibles comme les numéros de cartes de crédit, les numéros AVS et les adresses mails.
+**Réponse :**  Il permet la détection et le filtrage de données sensibles comme les numéros de cartes de crédit, les numéros de sécurité sociale et les adresses mails.
 
 ---
 
@@ -915,7 +917,7 @@ TCP Options (1) => MSS: 1460
 
 ---
 
-**Réponse :**  C'est un outil très complet qui permet de mettre en place des règles complexes et comme il est open source, il est possible de compter sur la communauté pour nous fournir des configurations pré-faites efficaces. Cependant, ayant eu des problèmes concernant la détection de certains trafics en ayant configuré des règles pourtant simples, nous nous interrogeons sur sa fiabilité. L'arrêt du système de détection n'a jamais pu être effectué normalement (utilisation de la commande `kill`), ce qui nous empêchait d'avoir le rapport de détection, ce qui peut être handicapant.
+**Réponse :**  C'est un outil très complet qui permet de mettre en place des règles complexes et comme il est open source, il est possible de compter sur la communauté pour nous fournir des configurations pré-faites efficaces. Il était intéressant de le prendre en main pour avoir une introduction sur comment fonctionnent les IDS. Cependant, ayant eu des problèmes concernant la détection de certains trafics en ayant configuré des règles pourtant simples, nous nous interrogeons sur sa fiabilité. 
 
 ---
 
