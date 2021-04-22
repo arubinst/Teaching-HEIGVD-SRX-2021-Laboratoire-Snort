@@ -606,7 +606,7 @@ La règle alerte toutes les adresses qui essaient de se connecter sur le port 22
 
 **Réponse :**  
 
-![](images/15-SSH_14.png)
+ca écrit pas ???!!
 
 ---
 
