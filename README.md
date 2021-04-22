@@ -535,7 +535,7 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 On crée une alerte lorsqu'un paquet provenant de la machine client vers l'IPS sur le port 22 est détecte.
 
-(On a pas réussi à reproduire le comportement. Les alertes ne fonctionnent lorsque l'on utilise ssh)
+(On a pas réussi à reproduire le comportement. Les alertes ne fonctionnent plus lorsque l'on utilise ssh)
 
 ---
 
