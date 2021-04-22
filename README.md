@@ -344,11 +344,9 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 **Question 1: Qu'est ce que signifie les "preprocesseurs" dans le contexte de Snort ?**
 
-Modules utilisateurs qui peuvent ajouter des fonctionnalités , notamment afin de pouvoir décoder des paquets pour que snort puisse les traiter.
-
 ---
 
-**Réponse :**  
+**Réponse :**  Modules utilisateurs qui peuvent ajouter des fonctionnalités , notamment afin de pouvoir décoder des paquets pour que snort puisse les traiter.
 
 ---
 
@@ -356,9 +354,9 @@ Modules utilisateurs qui peuvent ajouter des fonctionnalités , notamment afin d
 
 ---
 
-**Réponse :**  
+**Réponse :**  Parce que aucun preprocessor n'est chargé.
 
-Parce que aucun preprocessor n'est chargé.
+![Q2](./images/Q2.png)
 
 ---
 
@@ -391,7 +389,7 @@ sudo snort -c myrules.rules -i eth0
 
 ---
 
-**Réponse :**  Les paramètres de configurations de snort, avec une compte de toutes les règles actives par protocoles concernés
+**Réponse :**  Les paramètres de configurations de snort, avec une compte de toutes les règles actives par protocoles concernés![Q4](./images/Q4.png)
 
 ---
 
@@ -418,6 +416,8 @@ Arrêter Snort avec `CTRL-C`.
 - Des statistiques sur les paquets (Nombre recus, pourcentage analysé, rejeté, filtré, ignoré)
 - Statistique des paquets par protocole
 - Statistique des actions entreprises (Nombre de paquet)
+
+![Q6](/home/leonard/Documents/BA4/SRX/Labo3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/Q6.png)
 
 ---
 
@@ -500,7 +500,9 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  ```15:14:23.090275 IP Client.lan > IDS: ICMP echo request, id 29204, seq 19, length 64```
+**Réponse :**  ```0.000000 192.168.10.3 ? 192.168.10.2 ICMP 98 Echo (ping) request  id=0x58f1, seq=1/256, ttl=64```
+
+![Q12](/home/leonard/Documents/BA4/SRX/Labo3/Teaching-HEIGVD-SRX-2021-Laboratoire-Snort/images/Q12.png)
 
 ---
 
@@ -529,9 +531,11 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Réponse :**  `alert tcp 192.168.10.3 any -> 192.168.10.2 22 (msg:"SSH"; sid:4000003; rev:1;)`
+**Réponse :**  `alert tcp 192.168.10.3 any -> 192.168.10.2 22 (flags: S;msg:"SSH"; sid:4000003; rev:1;)`
 
-On crée une alerte lorsqu'une paquet provenant de la machine client vers l'IPS sur le port 22 est détecte
+On crée une alerte lorsqu'une paquet provenant de la machine client vers l'IPS sur le port 22 est détecte.
+
+(On a pas réussi à reproduire le comportement. Les alertes ne fonctionnent plus avec cette commande)
 
 ---
 
