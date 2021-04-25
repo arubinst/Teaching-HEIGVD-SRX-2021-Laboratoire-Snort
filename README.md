@@ -31,7 +31,7 @@ Clonez le repo sur votre machine. Vous pouvez répondre aux questions en modifia
 [Cleanup](#cleanup)
 
 
-## Echéance 
+## Échéance 
 
 Ce travail devra être rendu au plus tard, **le 29 avril 2021 à 23h59.**
 
@@ -97,7 +97,7 @@ Par exemple, pour ouvrir un terminal sur votre IDS :
 docker exec -it IDS /bin/bash
 ```
 
-Optionnelement, vous pouvez utiliser les scripts [openids.sh](scripts/openids.sh) et [openclient.sh](scripts/openclient.sh) pour contacter les conteneurs.
+Optionnellement, vous pouvez utiliser les scripts [openids.sh](scripts/openids.sh) et [openclient.sh](scripts/openclient.sh) pour contacter les conteneurs.
 
 Vous pouvez bien évidemment lancer des terminaux avec les deux machines en même temps ou même lancer plusieurs terminaux sur la même machine. ***Il est en fait conseillé pour ce laboratoire de garder au moins deux terminaux ouverts sur la machine IDS en tout moment***.
 
@@ -346,7 +346,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Ce sont des composant qui traitent les paquets (agissent sur eux) avant de passer par les règles.
 
 ---
 
@@ -354,7 +354,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Car nous n'avons pas défini de préprocesseur dans notre fichier de règle, contrairement au fichier snort.conf.
 
 ---
 
@@ -370,7 +370,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  
+**Réponse :**  Une alert avec le message: "Mon nom!" est levée sur tous les paquets tcp entrants et sortants (any) et contenant la chaine de caractère: "Rubinstein"
 
 ---
 
@@ -386,6 +386,107 @@ sudo snort -c myrules.rules -i eth0
 
 **Réponse :**  
 
+Il s'agit des messages d'initialisation de snort. 
+
+Ils nous indique
+
+- la configuration qu'il a trouvé dans notre fichier (nombre de règles, préprocesseurs, ...)
+- l'interface réseau sur laquelle il va travailler
+- ses infos (version, licences...)
+- et le plus important, une fois l'initialisation terminée, son pid, pour pouvoir le kill lorsqu'il ne quitte pas rapidement :)
+
+![](images\Q4-myrules.png)
+
+​																						(...)
+
+````
+┌──(root💀IDS)-[/]
+└─# snort -c /root/myrules.rules -i eth0
+Running in IDS mode
+
+        --== Initializing Snort ==--
+Initializing Output Plugins!
+Initializing Preprocessors!
+Initializing Plug-ins!
+Parsing Rules file "/root/myrules.rules"
+Tagged Packet Limit: 256
+Log directory = /var/log/snort
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Initializing rule chains...
+1 Snort rules read
+    1 detection rules
+    0 decoder rules
+    0 preprocessor rules
+1 Option Chains linked into 1 Chain Headers
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++-------------------[Rule Port Counts]---------------------------------------
+|             tcp     udp    icmp      ip
+|     src       0       0       0       0
+|     dst       0       0       0       0
+|     any       1       0       0       0
+|      nc       0       0       0       0
+|     s+d       0       0       0       0
++----------------------------------------------------------------------------
+
++-----------------------[detection-filter-config]------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[detection-filter-rules]-------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[rate-filter-config]-----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[rate-filter-rules]------------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[event-filter-config]----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[event-filter-global]----------------------------------
++-----------------------[event-filter-local]-----------------------------------
+| none
++-----------------------[suppression]------------------------------------------
+| none
+-------------------------------------------------------------------------------
+Rule application order: pass->drop->sdrop->reject->alert->log
+Verifying Preprocessor Configurations!
+
+[ Port Based Pattern Matching Memory ]
++-[AC-BNFA Search Info Summary]------------------------------
+| Instances        : 1
+| Patterns         : 1
+| Pattern Chars    : 8
+| Num States       : 8
+| Num Match States : 1
+| Memory           :   1.62Kbytes
+|   Patterns       :   0.05K
+|   Match Lists    :   0.09K
+|   Transitions    :   1.09K
++-------------------------------------------------
+pcap DAQ configured to passive.
+Acquiring network traffic from "eth0".
+Reload thread starting...
+Reload thread started, thread 0x7f1a87c95700 (48)
+Decoding Ethernet
+
+        --== Initialization Complete ==--
+
+   ,,_     -*> Snort! <*-
+  o"  )~   Version 2.9.15.1 GRE (Build 15125) 
+   ''''    By Martin Roesch & The Snort Team: http://www.snort.org/contact#team
+           Copyright (C) 2014-2019 Cisco and/or its affiliates. All rights reserved.
+           Copyright (C) 1998-2013 Sourcefire, Inc., et al.
+           Using libpcap version 1.10.0 (with TPACKET_V3)
+           Using PCRE version: 8.39 2016-06-14
+           Using ZLIB version: 1.2.11
+
+Commencing packet processing (pid=47)
+````
+
+
+
 ---
 
 Aller à un site web contenant dans son text la phrase ou le mot clé que vous avez choisi (il faudra chercher un peu pour trouver un site en http... Si vous n'y arrivez pas, vous pouvez utiliser [http://neverssl.com](http://neverssl.com) et modifier votre votre règle pour détecter un morceau de text contenu dans le site).
@@ -396,6 +497,10 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 **Réponse :**  
 
+![](images\Q5-neverssl.png)
+
+Nous voyons uniquement les warnings, car les alertes sont envoyées dans le fichier de log.
+
 ---
 
 Arrêter Snort avec `CTRL-C`.
@@ -405,6 +510,18 @@ Arrêter Snort avec `CTRL-C`.
 ---
 
 **Réponse :**  
+
+![](images\Q6-snort-fin.png)
+
+​																						(...)
+
+- statistiques de temps (exécution totale, nombre de paquets traités...)
+- statistique sur l'utilisation de la mémoire
+- statistique sur le traitement des paquets (nombre reçu, analysé... )
+- statistique sur les type de paquets analysées par protocoles
+- statistique sur les action de snort (alertes lancées, logs...)
+
+
 
 ---
 
@@ -417,20 +534,50 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 **Réponse :**  
 
----
+Notre règle:
 
+````bash
+alert tcp any any -> any any (msg:"My alert"; content:"website"; sid:4000044; rev:1;)
+````
+
+![image-20210415151844171](images\Q5-alert.png)
+
+- ligne 1: n° de révision, identifiant de la règle (sid), le message de l'alerte
+
+- ligne 2: la priorité de l'alerte.
+
+- ligne 3: date/heure, ip/port source (ici le site web), ip/port destination (ici la machine Client)
+
+- ligne 4-5: le protocole et les infos du paquets
+
+  
+
+---
 
 --
 
-### Detecter une visite à Wikipedia
+### Détecter une visite à Wikipedia
 
-Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wikipedia est visité **SPECIFIQUEMENT DEPUIS VOTRE MACHINE CLIENT**. Ne pas utiliser une règle qui détecte un string ou du contenu**.
+Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wikipedia est visité **SPECIFIQUEMENT DEPUIS VOTRE MACHINE CLIENT**. Ne pas utiliser une règle qui détecte un string ou du contenu.
 
 **Question 8: Quelle est votre règle ? Où le message a-t'il été journalisé ? Qu'est-ce qui a été journalisé ?**
 
 ---
 
 **Réponse :**  
+
+````bash
+# La règle s'appèle wikimedia car nous ne pouvons pas différencier les services Wikimedia sans utiliser de detection de contenu.
+# Nous sélectionnons les paquets qui n'ont que le flag S (SYN) pour n'avoir que le premier paquet de la connexion.
+log tcp 192.168.1.3 any -> 91.198.174.192 any (msg:"Wikimedia"; flags:S; sid:1000006; rev:1;)
+
+````
+
+La règle a été journalisée dans un nouveau fichier /var/log/snort/snort.log.xx.
+
+![](images\Q8-wiki-log.png)
+
+
 
 ---
 
@@ -446,14 +593,19 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
----
+````bash
+alert icmp any any -> 192.168.1.2 any (msg:"Ping Detected"; itype:8; sid:40000045; rev:1;)
+````
 
+---
 
 **Question 10: Comment avez-vous fait pour que ça identifie seulement les pings entrants ?**
 
 ---
 
 **Réponse :**  
+
+Nous avons spécifié l'ip de la destination. Seul les ping de type ECHO allant vers IDS sont loggés.
 
 ---
 
@@ -464,6 +616,10 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+Dans le fichier de log  `/var/log/snort/alert` ainsi qu'un des fichier de log `snort.log.xx`.
+
+<img src="images\Q11-ping-alert.png" style="zoom: 80%;" />
+
 ---
 
 
@@ -473,11 +629,15 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+Les pings entrant avec, la source/destination et les info du ping.
+
+![](images\Q12-log.png)
+
 ---
 
 --
 
-### Detecter les ping dans les deux sens
+### Détecter les ping dans les deux sens
 
 Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
@@ -487,12 +647,19 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 **Réponse :**  
 
----
+En modifiant la flèche de `->` à `<>` pour indiquer les deux sens.
 
+````bash
+alert icmp any any <> 192.168.1.2 any (msg:"Ping Detected"; itype:8; sid:40000046; rev:1;)
+````
+
+<img src="images\Q13-ping.png" style="zoom: 80%;" />
+
+---
 
 --
 
-### Detecter une tentative de login SSH
+### Détecter une tentative de login SSH
 
 Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été faite depuis la machine Client sur l'IDS.
 
@@ -502,6 +669,18 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  
 
+````bash
+alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"Tentative de connexion ssh"; flags:S; sid:10000005; rev:1;)
+````
+
+Source: Client tous les ports
+
+Destination: IDS port 22
+
+L'alerte est levée uniquement pour les paquets de Client vers IDS ayant le flag SYN, qui est le premier lors du handshake tcp.
+
+Nous avons donc une alerte pour chaque tentative de connexion réussie ou pas, mais pas pour les connexion établies.
+
 ---
 
 
@@ -510,6 +689,10 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 ---
 
 **Réponse :**  
+
+Messages pour une connexion échouée, puis une réussie.
+
+<img src="images\Q15-ssh.png" style="zoom: 80%;" />
 
 ---
 
@@ -525,13 +708,17 @@ Pour lancer une capture dans un fichier, utiliser la commande suivante :
 tshark -w nom_fichier.pcap
 ```
 
-Générez du trafic depuis le deuxième terminal qui corresponde à l'une des règles que vous avez ajoutées à votre fichier de configuration personnel. Arrêtez la capture avec ```Ctrl-C```.
+Générez du trafic depuis le deuxième terminal qui corresponde à l'une des règles que vous avez ajoutées à votre fichier de tes. Arrêtez la capture avec ```Ctrl-C```.
 
 **Question 16: Quelle est l'option de Snort qui permet d'analyser un fichier pcap ou un fichier log ?**
 
 ---
 
 **Réponse :**  
+
+`snort -c confFile -r file.Pcap -k none`
+
+Le `-k none` nous a été nécessaire sur tout le labo pour des questions de bad checksum voir: https://www.snort.org/faq/i-m-not-receiving-alerts-in-snort
 
 ---
 
@@ -543,6 +730,8 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 **Réponse :**  
 
+Il se comporte comme pour une analyse en temps réel.
+
 ---
 
 **Question 18: Est-ce que des alertes sont aussi enregistrées dans le fichier d'alertes?**
@@ -550,6 +739,8 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 ---
 
 **Réponse :**  
+
+oui
 
 ---
 
@@ -565,6 +756,10 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
+`fragroute` permet de modifier des paquets pour ne pas être détecté par un IDS.
+
+`fragrouter` est une sorte de routeur virtuel qui peut modifier le trafic et les paquet (fragmentation)
+
 ---
 
 
@@ -574,14 +769,21 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
----
+Les paquets sont fragmenté en morceaux pour éviter la détection.
 
+---
 
 **Question 21: Qu'est-ce que le `Frag3 Preprocessor` ? A quoi ça sert et comment ça fonctionne ?**
 
 ---
 
 **Réponse :**  
+
+Ce préprocesseur permet de réassembler les fragments d'un paquets.
+
+Cela permet de bloquer les attaques avec fragmentation de paquets. 
+
+Il doit probablement regarder le flag `MF more fragment` de chaque paquet.
 
 ---
 
@@ -596,6 +798,10 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 ---
 
 **Réponse :**  
+
+````bash
+alert tcp any any -> 192.168.1.2 22 (msg:"TCP scan on port 22"; flags:R; ack:0;  sid:1000009; rev:1;)
+````
 
 ---
 
@@ -619,6 +825,10 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
+Une alerte est levée.
+
+<img src="images\Q23-nmap.png" alt="Q23-nmap" style="zoom: 80%;" />
+
 ---
 
 
@@ -631,8 +841,13 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
----
+Une alerte est levée.
 
+<img src="images\Q24-fragmnt.png" style="zoom:80%;" />
+
+<img src="images\Q24-frag3-stat.png" style="zoom:80%;" />
+
+---
 
 **Question 25: A quoi sert le `SSL/TLS Preprocessor` ?**
 
@@ -640,14 +855,17 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
----
+A détecter que le handshake TCP c'est fait de façon sécurisée -> que la connexion est bien sécurisée.
 
+---
 
 **Question 26: A quoi sert le `Sensitive Data Preprocessor` ?**
 
 ---
 
 **Réponse :**  
+
+A détecter des information personnels sensibles (email, n° carte crédit et d'autres) dans le contenu du paquet.
 
 ---
 
@@ -659,6 +877,12 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 ---
 
 **Réponse :**  
+
+Snort est un outils très complet et performant, mais la documentation officiel n'est pas facile à lire, et il n'y a pas vraiment de tutoriel avancé sur le web.
+
+Pour pouvoir l'utiliser efficacement il faut bien comprendre la partie réseau de ce que l'on cherche à analyser.
+
+On a passé du temps a chercher comment certains paquets étaient construit, et ce qu'il se passe lors de certaines connexion (par ex. ssh vs scan nmap sur port 22) .
 
 ---
 
