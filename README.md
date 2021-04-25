@@ -395,7 +395,8 @@ Ils nous indique
 - ses infos (version, licences...)
 - et le plus important, une fois l'initialisation terminée, son pid, pour pouvoir le kill lorsqu'il ne quitte pas rapidement :)
 
-![](images\Q4-myrules.png)
+![Q4](images/Q4-myrules.png)
+
 
 ​																						(...)
 
@@ -497,7 +498,7 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 **Réponse :**  
 
-![](images\Q5-neverssl.png)
+![Q5](images/Q5-neverssl.png)
 
 Nous voyons uniquement les warnings, car les alertes sont envoyées dans le fichier de log.
 
@@ -511,7 +512,7 @@ Arrêter Snort avec `CTRL-C`.
 
 **Réponse :**  
 
-![](images\Q6-snort-fin.png)
+![Q6](images/Q6-snort-fin.png)
 
 ​																						(...)
 
@@ -540,7 +541,7 @@ Notre règle:
 alert tcp any any -> any any (msg:"My alert"; content:"website"; sid:4000044; rev:1;)
 ````
 
-![image-20210415151844171](images\Q5-alert.png)
+![image-20210415151844171](images/Q5-alert.png)
 
 - ligne 1: n° de révision, identifiant de la règle (sid), le message de l'alerte
 
@@ -575,7 +576,7 @@ log tcp 192.168.1.3 any -> 91.198.174.192 any (msg:"Wikimedia"; flags:S; sid:100
 
 La règle a été journalisée dans un nouveau fichier /var/log/snort/snort.log.xx.
 
-![](images\Q8-wiki-log.png)
+![Q8](images/Q8-wiki-log.png)
 
 
 
@@ -618,7 +619,7 @@ Nous avons spécifié l'ip de la destination. Seul les ping de type ECHO allant 
 
 Dans le fichier de log  `/var/log/snort/alert` ainsi qu'un des fichier de log `snort.log.xx`.
 
-<img src="images\Q11-ping-alert.png" style="zoom: 80%;" />
+<img src="images/Q11-ping-alert.png" style="zoom: 80%;" />
 
 ---
 
@@ -631,7 +632,7 @@ Dans le fichier de log  `/var/log/snort/alert` ainsi qu'un des fichier de log `s
 
 Les pings entrant avec, la source/destination et les info du ping.
 
-![](images\Q12-log.png)
+![Q12](images/Q12-log.png)
 
 ---
 
@@ -653,7 +654,7 @@ En modifiant la flèche de `->` à `<>` pour indiquer les deux sens.
 alert icmp any any <> 192.168.1.2 any (msg:"Ping Detected"; itype:8; sid:40000046; rev:1;)
 ````
 
-<img src="images\Q13-ping.png" style="zoom: 80%;" />
+<img src="images/Q13-ping.png" style="zoom: 80%;" />
 
 ---
 
@@ -692,7 +693,7 @@ Nous avons donc une alerte pour chaque tentative de connexion réussie ou pas, m
 
 Messages pour une connexion échouée, puis une réussie.
 
-<img src="images\Q15-ssh.png" style="zoom: 80%;" />
+<img src="images/Q15-ssh.png" style="zoom: 80%;" />
 
 ---
 
@@ -827,7 +828,7 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 Une alerte est levée.
 
-<img src="images\Q23-nmap.png" alt="Q23-nmap" style="zoom: 80%;" />
+<img src="images/Q23-nmap.png" alt="Q23-nmap" style="zoom: 80%;" />
 
 ---
 
@@ -843,9 +844,9 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 Une alerte est levée.
 
-<img src="images\Q24-fragmnt.png" style="zoom:80%;" />
+<img src="images/Q24-fragmnt.png" style="zoom:80%;" />
 
-<img src="images\Q24-frag3-stat.png" style="zoom:80%;" />
+<img src="images/Q24-frag3-stat.png" style="zoom:80%;" />
 
 ---
 
