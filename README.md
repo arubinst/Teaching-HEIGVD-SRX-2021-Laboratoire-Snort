@@ -1,3 +1,7 @@
+#TODO : Q8, Q14, Q15, Q16, Q17, Q18
+
+
+
 # Teaching-HEIGVD-SRX-2021-Laboratoire-Snort
 
 **Ce travail de laboratoire est à faire en équipes de 2 personnes**
@@ -719,7 +723,13 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 ---
 
-**Réponse :**  
+Si on veut des *echo-requests* des deux cotés :
+
+alert icmp any any <> 192.168.1.2 any (itype:8; msg:"Ping received"; sid:4000001; rev:2;)
+
+Si on veut recevoir les *echo-replies* aussi
+
+alert icmp any any <> 192.168.1.2 any (msg:"Ping received"; sid:4000001; rev:3;)
 
 ---
 
@@ -734,7 +744,8 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Réponse :**  
+**TODO**
+alert tcp 192.168.1.3 any -> 192.168.1.2 22
 
 ---
 
@@ -797,7 +808,8 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+* fragroute intercèpte, modifie et réecrie le trafic sortant destiné à une hôte.
+* fragrouter est un toolkit permettant d'éviter les NIDS. 
 
 ---
 
@@ -806,7 +818,8 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+* fragroute utilise les paquets "fragments". Ce sont les paquets de plus petite taille quand un paquet est plus grand que la MTU (Maximum Transmission Unit). Et fragroute utilise alors ces paquets pour intercepter modifier et réecrire des paquets allant vers une hôte.
+* fragrouter fonctionne en acceptant des paquets IP d'un attaquant, il les fragmente selon une certaine attaque (il en possède une liste) puis restransmet les paquets fragmentés à la victime.
 
 ---
 
@@ -815,7 +828,9 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+C'est un module de fragmentation de paquet pour Snort. Le but de ce module est d'être un anti-évasion module afin d'éviter les commandes décritent au dessus de fonctionner. Le but c'est de regarder au niveau de la cible et pas seulement des protocoles. Si un attaquant connaît le type de fragmentation IP qu'une cible utilise, il peut outrepasser un IDS. Frag3 permet de donner des informations à l'IDS sur l'hôte pour éviter ces attaques.
+
+www.snort.org/faq/readme-frag3
 
 ---
 
@@ -829,7 +844,7 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 
 ---
 
-**Réponse :**  
+alert tcp any any -> 192.168.1.2 22 (flags:S; msg:"SYN scan"; sid:4000005;rev:1;)
 
 ---
 
@@ -851,7 +866,11 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 ---
 
-**Réponse :**  
+Quand on le lance sans fragmentation on retrouve bien notr alerte :
+
+![](./images/alertSYNScan.png)
+
+Lors du deuxième scan, l'IDS n'a rien détécté.
 
 ---
 
@@ -863,7 +882,15 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+```
+preprocessor frag3_global:
+preprocessor frag3_engine:
+alert tcp any any -> 192.168.1.2 22 (flags:S; msg:"SYN scan"; sid:4000005;rev:1;)
+```
+
+L'alerte est bien apparue :
+
+![](./images/alert3.png)
 
 ---
 
@@ -872,7 +899,9 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+Il permet d'inspecter le trafic SSL/TLS et de déterminer s'il doit continuer l'inspection de ce dit traffic afin de gagner du temps. Au debut du paquet SSL il y a toujours une partie non-chiffrée qui donne des informations sur le trafic et l'état actuel de la connexion, ce preprocesseur va vérifier si le *handshake* est bien terminé et que tout c'est bien passé. En gros il permet d'empêcher qu'un *handshake* a été crafté pour éviter l'IDS et d'être sur que les données envoyées sont vraiment chiffrées.
+
+www.snort.org/faq/readme-ssl
 
 ---
 
@@ -881,7 +910,9 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+C'est un module snort permettant la détection et le filtrage de données sensibles comme les numéros de carte de crédit, numéro de sécurité social et adresses email.
+
+www.snort.org/faq/readme-sensitive_data
 
 ---
 
@@ -892,7 +923,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+C'est un bon laboratoire permettant de bien lier la théorie et la pratique. Nous avons eu pas mal de problèmes lors de ce laboratoires (fichiers log ne se créaient pas, reboot image docker obligatoire, problème de DNS) mais en général c'était très intéressant. Snort est un bel outil qui a une grosse marche de progression, il y a énormement de possiblités et ça nous interesserait de voir plus loin. C'est un outil open source qui ne fait que d'évoluer, on l'a vu avec frag3 qui utilise un concepte assez recent (target-based).
 
 ---
 
