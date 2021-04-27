@@ -376,7 +376,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-C'est une alerte envoyé à syslog avec le message "Mon nom!" Le message se trouve dans /var/log/snort/alerts et le paquet dans le fichier snort.log. L'alerte s'active pour le traffic tcp venant de n'importe quelle adresse et port vers n'importe quelle adresse et port également avec le contenu  "Rubinstein". Cette alerte est locale et la première version avec l'identificateur "4000015". 
+La règle permet d'ajouter une alerte portant le nom "Mon nom!" dans le fichier /var/log/snort/alert lorsqu'un paquet venant de n'importe quel(le) adresse/port à destination de n'importe quel(le) adresse/port contient le string "Rubinstein". Sid et rev permettent d'identifier la règle de manière unique. Un fichier de log va aussi être créé (/var/log/snort/snort.log.*) lors de la détection de mêmes paquets.
 
 ---
 
@@ -636,7 +636,7 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 Le mot qui devait activer l'alerte est le mot "website" qui a été trigger plusieurs fois (car le mot y est plusieurs fois). 
 
-* Au tout debut nous avons l'id et le vérsion de la règle avec le message qu'on voulait afficher. 
+* Au tout debut nous avons l'id et le vérsion ([1:sid:rev]) de la règle avec le message qu'on voulait afficher . 
 * La deuxième ligne montre la priorité (classType) de l'alerte. 
 * La troisième affiche la date et l'heure ainsi que les adresses de départ et de destination.
 * Les lignes restantes affichent des informations sur le paquet.
@@ -653,12 +653,11 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 ---
 
-**FONCIONNE PAS J?ARRIVE PAS A AVOIR LES CLASSTYPE**
-log tcp 192.168.1.3 any -> any [80,443] (msg:"Wikipedia visited"; classtype: web-application-activity; reference:url,https://en.wikipedia.org; sid:4000000; rev:1;)
-
-log tcp 192.168.1.3 any -> 91.198.174.192 [80,443] (msg:"Wikipedia visited"; sid:4000000; rev:1;)
-
-Le message est journalisé dans le fichier /var/log/snort/log.xxxxxxxx.xxx, il contiendra les paquets tcp à destination de wikipedia.org. **NE FONCTIONNE PAS, J?ARRIVE PAS A OUVRIR LA PAGE WIKIPEDIA I DONT KNOW WHY**
+**Réponse :** 
+* La règle est : **log tcp 192.168.1.3 any -> 91.168.174.194 any (sid:4000001; rev:1;)**
+* Le message a été journalisé dans le fichier **/var/log/snort/snot.log.1619525012** au format pcap.
+  
+![](./images/snort1.PNG)
 
 ---
 
@@ -707,7 +706,7 @@ On peut le trouver dans deux fichiers différents se trouvant dans /var/log/snor
 
 ---
 
-Nous avons tous les paquets qui satisfons la règle que nous avons donné. Nous avons alors tous les pings reçu depuis la machine Client.
+Nous avons tous les paquets détectés par la règle que nous avons donné. Nous avons alors tous les pings reçu depuis la machine Client.
 
 ![](./images/log2.png)
 
@@ -744,8 +743,12 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**TODO**
-alert tcp 192.168.1.3 any -> 192.168.1.2 22
+**Réponse :**
+* La règle : alert tcp 192.168.1.3 any -> 192.168.1.2 4040 (msg:"Ssh connection"; sid:4000003; rev:1;)
+* Ssh utilise le protocol tcp avec comme port 22 (la connexion ssh ne fonctionnait pas avec le port 22, nous l'avons donc changé en 4040 en modifiant le fichier /etc/ssh/sshd_config). 
+* L'adresse source est la machine Client, et l'adresse de destination est l'IDS avec le port 4040. 
+* Chaque alerte aura comme nom "Ssh connection".
+
 
 ---
 
@@ -754,7 +757,7 @@ alert tcp 192.168.1.3 any -> 192.168.1.2 22
 
 ---
 
-**Réponse :**  
+**Réponse :**  ![](./images/alert15.PNG)
 
 ---
 
@@ -776,7 +779,7 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 ---
 
-**Réponse :**  
+**Réponse :**  snort --pcap-single tcpdumpFile  (donne le même résultat que snort -r tf)
 
 ---
 
@@ -786,7 +789,10 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Le comportement change un peu :
+* Il y a des informations affichées directement sur la console pour chaque paquet du fichier de capture.
+* Les informations concernant le RunTime, la mémoire, l'I/O des paquets et les protocoles sont aussi affichée à la fin.
+* Tout ce qui concerne les fichiers de rules/logs/alerte/... n'est pas présent vu que c'est la lecture d'un fichier de capture et non une capture en elle-même.
 
 ---
 
@@ -794,7 +800,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Non, car ce n'est pas une capture en tant que telle, mais la lecture d'un fichier de capture.
 
 ---
 
@@ -808,7 +814,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-* fragroute intercèpte, modifie et réecrie le trafic sortant destiné à une hôte.
+* fragroute :  intercèpte, modifie et réécrit le trafic sortant destiné à une hôte afin d'éviter les IDS/IPS, alertes...
 * fragrouter est un toolkit permettant d'éviter les NIDS. 
 
 ---
@@ -819,7 +825,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 ---
 
 * fragroute utilise les paquets "fragments". Ce sont les paquets de plus petite taille quand un paquet est plus grand que la MTU (Maximum Transmission Unit). Et fragroute utilise alors ces paquets pour intercepter modifier et réecrire des paquets allant vers une hôte.
-* fragrouter fonctionne en acceptant des paquets IP d'un attaquant, il les fragmente selon une certaine attaque (il en possède une liste) puis restransmet les paquets fragmentés à la victime.
+* fragrouter fonctionne en acceptant des paquets IP d'un attaquant, il les fragmente selon une certaine attaque (il en possède une liste) puis restransmet les paquets fragmentés à la victime. Comme le paquet n'est plus dans l'état original d'une certaine attaque il ne sera pas forcément détecter par le NIDS de la cible.
 
 ---
 
@@ -923,7 +929,7 @@ www.snort.org/faq/readme-sensitive_data
 
 ---
 
-C'est un bon laboratoire permettant de bien lier la théorie et la pratique. Nous avons eu pas mal de problèmes lors de ce laboratoires (fichiers log ne se créaient pas, reboot image docker obligatoire, problème de DNS) mais en général c'était très intéressant. Snort est un bel outil qui a une grosse marche de progression, il y a énormement de possiblités et ça nous interesserait de voir plus loin. C'est un outil open source qui ne fait que d'évoluer, on l'a vu avec frag3 qui utilise un concepte assez recent (target-based).
+C'est un bon laboratoire permettant de bien lier la théorie et la pratique. Nous avons eu pas mal de problèmes lors de ce laboratoires (fichiers log ne se créaient pas, reboot image docker obligatoire, problème de DNS) mais en général c'était très intéressant. Snort est un bel outil qui a une grosse marche de progression, il y a énormement de possiblités et ça nous interesserait de voir plus loin. C'est un outil open source qui ne fait que d'évoluer, on l'a vu avec frag3 qui utilise un concept assez recent (target-based). Il demande beaucoup de rules différentes afin de détecter le plus d'attaques potentielles possibles. Il faut être conscient de tous les scénarios probables afin de pouvoir écrire les règles correspondantes et être sûr d'être averti au maximum de ce qu'il se passe sur notre réseau.
 
 ---
 
