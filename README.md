@@ -1,7 +1,3 @@
-#TODO : Q8, Q14, Q15, Q16, Q17, Q18
-
-
-
 # Teaching-HEIGVD-SRX-2021-Laboratoire-Snort
 
 **Ce travail de laboratoire est à faire en équipes de 2 personnes**
