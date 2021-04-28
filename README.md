@@ -698,7 +698,7 @@ On peut le trouver dans deux fichiers différents se trouvant dans /var/log/snor
 ---
 
 
-**Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
+**Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log`**
 
 ---
 
