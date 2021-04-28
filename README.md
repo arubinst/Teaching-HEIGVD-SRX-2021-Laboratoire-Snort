@@ -346,7 +346,9 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+Les preprocesseurs sont des plug-in qu'on peut ajouter à Snort afin d'amener d'autres fonctionnalités pour détécter des anomalies. Les preprocesseurs gèrent les paquets avant les règles de Snort. Par exemple il existe le preprocesseur "Stream4" permettant de détécter des scans. 
+
+www.oreilly.com/library/view/snort-cookbook/0596007914/ch04.html
 
 ---
 
@@ -354,7 +356,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+Car nous n'avons pas configurer de preprocesseurs pour notre fichier de règles ou de configuration "fait-maison".
 
 ---
 
@@ -370,7 +372,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  
+La règle permet d'ajouter une alerte portant le nom "Mon nom!" dans le fichier /var/log/snort/alert lorsqu'un paquet venant de n'importe quel(le) adresse/port à destination de n'importe quel(le) adresse/port contient le string "Rubinstein". Sid et rev permettent d'identifier la règle de manière unique. Un fichier de log va aussi être créé (/var/log/snort/snort.log.*) lors de la détection de mêmes paquets.
 
 ---
 
@@ -384,7 +386,108 @@ sudo snort -c myrules.rules -i eth0
 
 ---
 
-**Réponse :**  
+Voici l'alerte personnalisée que je vais utiliser sur le site neverssl.com de la question 5 :
+
+alert tcp any any -> any any (msg:"Il y a le mot webiste"; content:"website"; sid:4000000; rev:1;)
+
+La première partie lorsqu'on lance le logiciel est l'initialisation. Snort regarde s'il y a des plug-ins, preprocessors et des règles. On voit qu'il a trouvé notre règle personalisée et il nous affiche le chemin du fichier où se trouveront les logs. La règle se trouve bien sur le protocole tcp.
+
+```
+Running in IDS mode
+
+        --== Initializing Snort ==--
+Initializing Output Plugins!
+Initializing Preprocessors!
+Initializing Plug-ins!
+Parsing Rules file "myrules.rules"
+Tagged Packet Limit: 256
+Log directory = /var/log/snort
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Initializing rule chains...
+1 Snort rules read
+    1 detection rules
+    0 decoder rules
+    0 preprocessor rules
+1 Option Chains linked into 1 Chain Headers
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++-------------------[Rule Port Counts]---------------------------------------
+|             tcp     udp    icmp      ip
+|     src       0       0       0       0
+|     dst       0       0       0       0
+|     any       1       0       0       0
+|      nc       0       0       0       0
+|     s+d       0       0       0       0
++----------------------------------------------------------------------------
+
+```
+
+Ensuite il y a d'autres informations sur la configuration et de comment snort opère. Snort nous dit aussi sur quel trafic il sniff. L'initialisation est terminée.
+
+
+```
+
++-----------------------[detection-filter-config]------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[detection-filter-rules]-------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[rate-filter-config]-----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[rate-filter-rules]------------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[event-filter-config]----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[event-filter-global]----------------------------------
++-----------------------[event-filter-local]-----------------------------------
+| none
++-----------------------[suppression]------------------------------------------
+| none
+-------------------------------------------------------------------------------
+
+Rule application order: pass->drop->sdrop->reject->alert->log
+Verifying Preprocessor Configurations!
+
+[ Port Based Pattern Matching Memory ]
++-[AC-BNFA Search Info Summary]------------------------------
+| Instances        : 1
+| Patterns         : 1
+| Pattern Chars    : 8
+| Num States       : 8
+| Num Match States : 1
+| Memory           :   1.62Kbytes
+|   Patterns       :   0.05K
+|   Match Lists    :   0.09K
+|   Transitions    :   1.09K
++-------------------------------------------------
+pcap DAQ configured to passive.
+Acquiring network traffic from "eth0".
+Reload thread starting...
+Reload thread started, thread 0x7f22b7f8a700 (1236)
+Decoding Ethernet
+
+        --== Initialization Complete ==--
+
+```
+
+Ensuite le sniffing commence 
+
+```
+   ,,_     -*> Snort! <*-
+  o"  )~   Version 2.9.15.1 GRE (Build 15125) 
+   ''''    By Martin Roesch & The Snort Team: http://www.snort.org/contact#team
+           Copyright (C) 2014-2019 Cisco and/or its affiliates. All rights reserved.
+           Copyright (C) 1998-2013 Sourcefire, Inc., et al.
+           Using libpcap version 1.10.0 (with TPACKET_V3)
+           Using PCRE version: 8.39 2016-06-14
+           Using ZLIB version: 1.2.11
+
+Commencing packet processing (pid=1235)
+```
 
 ---
 
@@ -394,7 +497,11 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ---
 
-**Réponse :**  
+La page web s'affiche normalement. 
+
+![](./images/neverssl.png)
+
+Sur snort par contre, il y a plusieurs ligne de "WARNING: No preprocessors configured for policy 0" ce qui veut dire qu'il a sniffé le trafic.
 
 ---
 
@@ -404,7 +511,113 @@ Arrêter Snort avec `CTRL-C`.
 
 ---
 
-**Réponse :**  
+En premier lieu, il nous informe sur le temps de traitement.
+
+```
+^C*** Caught Int-Signal
+===============================================================================
+Run time for packet processing was 111.38643 seconds
+Snort processed 95 packets.
+Snort ran for 0 days 0 hours 1 minutes 51 seconds
+   Pkts/min:           95
+   Pkts/sec:            0
+
+```
+
+Ensuite de l'utilisation mémoire.
+
+```
+===============================================================================
+Memory usage summary:
+  Total non-mmapped bytes (arena):       4096000
+  Bytes in mapped regions (hblkhd):      30265344
+  Total allocated space (uordblks):      3347568
+  Total free space (fordblks):           748432
+  Topmost releasable block (keepcost):   591920
+```
+
+Puis le nombre de paquets reçu et qu'il a pu analysé ou non. On nous donne ensuite les détails par protocole du nombre de paquets reçu. Logiquement tous les paquets sniffé sont sur le protocole "Eth". On constate qu'on à plus de paquet UDP que TCP ce qui est à priori bizarre parce que http utilise TCP. Http utilise UDP pour d'autres fonctionnalités comme DNS, VOIP, NTP,... Dans la dernière partie nous montre les actions engendrées lors de l'analyse. Dans notre cas on ne demandais pas de bloquer ou de faire quoique ce soit, c'est juste une alerte donc il a tout accepté.
+
+```
+===============================================================================
+Packet I/O Totals:
+   Received:           96
+   Analyzed:           95 ( 98.958%)
+    Dropped:            0 (  0.000%)
+   Filtered:            0 (  0.000%)
+Outstanding:            1 (  1.042%)
+   Injected:            0
+===============================================================================
+Breakdown by protocol (includes rebuilt packets):
+        Eth:           95 (100.000%)
+       VLAN:            0 (  0.000%)
+        IP4:           87 ( 91.579%)
+       Frag:            0 (  0.000%)
+       ICMP:            0 (  0.000%)
+        UDP:           54 ( 56.842%)
+        TCP:           33 ( 34.737%)
+        IP6:            0 (  0.000%)
+    IP6 Ext:            0 (  0.000%)
+   IP6 Opts:            0 (  0.000%)
+      Frag6:            0 (  0.000%)
+      ICMP6:            0 (  0.000%)
+       UDP6:            0 (  0.000%)
+       TCP6:            0 (  0.000%)
+     Teredo:            0 (  0.000%)
+    ICMP-IP:            0 (  0.000%)
+    IP4/IP4:            0 (  0.000%)
+    IP4/IP6:            0 (  0.000%)
+    IP6/IP4:            0 (  0.000%)
+    IP6/IP6:            0 (  0.000%)
+        GRE:            0 (  0.000%)
+    GRE Eth:            0 (  0.000%)
+   GRE VLAN:            0 (  0.000%)
+    GRE IP4:            0 (  0.000%)
+    GRE IP6:            0 (  0.000%)
+GRE IP6 Ext:            0 (  0.000%)
+   GRE PPTP:            0 (  0.000%)
+    GRE ARP:            0 (  0.000%)
+    GRE IPX:            0 (  0.000%)
+   GRE Loop:            0 (  0.000%)
+       MPLS:            0 (  0.000%)
+        ARP:            8 (  8.421%)
+        IPX:            0 (  0.000%)
+   Eth Loop:            0 (  0.000%)
+   Eth Disc:            0 (  0.000%)
+   IP4 Disc:            0 (  0.000%)
+   IP6 Disc:            0 (  0.000%)
+   TCP Disc:            0 (  0.000%)
+   UDP Disc:            0 (  0.000%)
+  ICMP Disc:            0 (  0.000%)
+All Discard:            0 (  0.000%)
+      Other:            0 (  0.000%)
+Bad Chk Sum:           73 ( 76.842%)
+    Bad TTL:            0 (  0.000%)
+     S5 G 1:            0 (  0.000%)
+     S5 G 2:            0 (  0.000%)
+      Total:           95
+===============================================================================
+Action Stats:
+     Alerts:            0 (  0.000%)
+     Logged:            0 (  0.000%)
+     Passed:            0 (  0.000%)
+Limits:
+      Match:            0
+      Queue:            0
+        Log:            0
+      Event:            0
+      Alert:            0
+Verdicts:
+      Allow:           95 ( 98.958%)
+      Block:            0 (  0.000%)
+    Replace:            0 (  0.000%)
+  Whitelist:            0 (  0.000%)
+  Blacklist:            0 (  0.000%)
+     Ignore:            0 (  0.000%)
+      Retry:            0 (  0.000%)
+===============================================================================
+Snort exiting
+```
 
 ---
 
@@ -415,8 +628,14 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 ---
 
-**Réponse :**  
+![](./images/paquetAlert.png)
 
+Le mot qui devait activer l'alerte est le mot "website" qui a été trigger plusieurs fois (car le mot y est plusieurs fois). 
+
+* Au tout debut nous avons l'id et le vérsion ([1:sid:rev]) de la règle avec le message qu'on voulait afficher . 
+* La deuxième ligne montre la priorité (classType) de l'alerte. 
+* La troisième affiche la date et l'heure ainsi que les adresses de départ et de destination.
+* Les lignes restantes affichent des informations sur le paquet.
 ---
 
 
@@ -430,7 +649,11 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 ---
 
-**Réponse :**  
+**Réponse :** 
+* La règle est : **log tcp 192.168.1.3 any -> 91.168.174.194 any (sid:4000001; rev:1;)**
+* Le message a été journalisé dans le fichier **/var/log/snort/snot.log.1619525012** au format pcap.
+  
+![](./images/snort1.PNG)
 
 ---
 
@@ -444,7 +667,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+alert icmp any any -> 192.168.1.2 any (itype:8; msg:"Ping received"; sid:4000002; rev:1;)
 
 ---
 
@@ -453,7 +676,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+On utilise l'option *itype:8* pour définir seulement les ping de type *echo-request*
 
 ---
 
@@ -462,16 +685,26 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+On peut le trouver dans deux fichiers différents se trouvant dans /var/log/snort/ : 
+
+* le fichier *alert*
+
+![](./images/alert1.png)
+
+* le fichier *snort.log.xxxxxxx*
+
+![](./images/log.png)
 
 ---
 
 
-**Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
+**Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log`**
 
 ---
 
-**Réponse :**  
+Nous avons tous les paquets détectés par la règle que nous avons donné. Nous avons alors tous les pings reçu depuis la machine Client.
+
+![](./images/log2.png)
 
 ---
 
@@ -485,7 +718,13 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 ---
 
-**Réponse :**  
+Si on veut des *echo-requests* des deux cotés :
+
+alert icmp any any <> 192.168.1.2 any (itype:8; msg:"Ping received"; sid:4000002; rev:2;)
+
+Si on veut recevoir les *echo-replies* aussi
+
+alert icmp any any <> 192.168.1.2 any (msg:"Ping received"; sid:4000002; rev:3;)
 
 ---
 
@@ -500,7 +739,12 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Réponse :**  
+**Réponse :**
+* La règle : alert tcp 192.168.1.3 any -> 192.168.1.2 4040 (msg:"Ssh connection"; sid:4000003; rev:1;)
+* Ssh utilise le protocol tcp avec comme port 22 (la connexion ssh ne fonctionnait pas avec le port 22, nous l'avons donc changé en 4040 en modifiant le fichier /etc/ssh/sshd_config). 
+* L'adresse source est la machine Client, et l'adresse de destination est l'IDS avec le port 4040. 
+* Chaque alerte aura comme nom "Ssh connection".
+
 
 ---
 
@@ -509,7 +753,7 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Réponse :**  
+**Réponse :**  ![](./images/alert15.PNG)
 
 ---
 
@@ -531,7 +775,7 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 ---
 
-**Réponse :**  
+**Réponse :**  snort --pcap-single tcpdumpFile  (donne le même résultat que snort -r tf)
 
 ---
 
@@ -541,7 +785,10 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Le comportement change un peu :
+* Il y a des informations affichées directement sur la console pour chaque paquet du fichier de capture.
+* Les informations concernant le RunTime, la mémoire, l'I/O des paquets et les protocoles sont aussi affichée à la fin.
+* Tout ce qui concerne les fichiers de rules/logs/alerte/... n'est pas présent vu que c'est la lecture d'un fichier de capture et non une capture en elle-même.
 
 ---
 
@@ -549,7 +796,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Non, car ce n'est pas une capture en tant que telle, mais la lecture d'un fichier de capture.
 
 ---
 
@@ -563,7 +810,8 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+* fragroute :  intercèpte, modifie et réécrit le trafic sortant destiné à une hôte afin d'éviter les IDS/IPS, alertes...
+* fragrouter est un toolkit permettant d'éviter les NIDS. 
 
 ---
 
@@ -572,7 +820,8 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+* fragroute utilise les paquets "fragments". Ce sont les paquets de plus petite taille quand un paquet est plus grand que la MTU (Maximum Transmission Unit). Et fragroute utilise alors ces paquets pour intercepter modifier et réecrire des paquets allant vers une hôte.
+* fragrouter fonctionne en acceptant des paquets IP d'un attaquant, il les fragmente selon une certaine attaque (il en possède une liste) puis restransmet les paquets fragmentés à la victime. Comme le paquet n'est plus dans l'état original d'une certaine attaque il ne sera pas forcément détecter par le NIDS de la cible.
 
 ---
 
@@ -581,7 +830,9 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+C'est un module de fragmentation de paquet pour Snort. Le but de ce module est d'être un anti-évasion module afin d'éviter les commandes décritent au dessus de fonctionner. Le but c'est de regarder au niveau de la cible et pas seulement des protocoles. Si un attaquant connaît le type de fragmentation IP qu'une cible utilise, il peut outrepasser un IDS. Frag3 permet de donner des informations à l'IDS sur l'hôte pour éviter ces attaques.
+
+www.snort.org/faq/readme-frag3
 
 ---
 
@@ -595,7 +846,7 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 
 ---
 
-**Réponse :**  
+alert tcp any any -> 192.168.1.2 22 (flags:S; msg:"SYN scan"; sid:4000005;rev:1;)
 
 ---
 
@@ -617,7 +868,11 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 ---
 
-**Réponse :**  
+Quand on le lance sans fragmentation on retrouve bien notr alerte :
+
+![](./images/alertSYNScan.png)
+
+Lors du deuxième scan, l'IDS n'a rien détécté.
 
 ---
 
@@ -629,7 +884,15 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+```
+preprocessor frag3_global:
+preprocessor frag3_engine:
+alert tcp any any -> 192.168.1.2 22 (flags:S; msg:"SYN scan"; sid:4000005;rev:1;)
+```
+
+L'alerte est bien apparue :
+
+![](./images/alert3.png)
 
 ---
 
@@ -638,7 +901,9 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+Il permet d'inspecter le trafic SSL/TLS et de déterminer s'il doit continuer l'inspection de ce dit traffic afin de gagner du temps. Au debut du paquet SSL il y a toujours une partie non-chiffrée qui donne des informations sur le trafic et l'état actuel de la connexion, ce preprocesseur va vérifier si le *handshake* est bien terminé et que tout c'est bien passé. En gros il permet d'empêcher qu'un *handshake* a été crafté pour éviter l'IDS et d'être sur que les données envoyées sont vraiment chiffrées.
+
+www.snort.org/faq/readme-ssl
 
 ---
 
@@ -647,7 +912,9 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+C'est un module snort permettant la détection et le filtrage de données sensibles comme les numéros de carte de crédit, numéro de sécurité social et adresses email.
+
+www.snort.org/faq/readme-sensitive_data
 
 ---
 
@@ -658,7 +925,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+C'est un bon laboratoire permettant de bien lier la théorie et la pratique. Nous avons eu pas mal de problèmes lors de ce laboratoires (fichiers log ne se créaient pas, reboot image docker obligatoire, problème de DNS) mais en général c'était très intéressant. Snort est un bel outil qui a une grosse marche de progression, il y a énormement de possiblités et ça nous interesserait de voir plus loin. C'est un outil open source qui ne fait que d'évoluer, on l'a vu avec frag3 qui utilise un concept assez recent (target-based). Il demande beaucoup de rules différentes afin de détecter le plus d'attaques potentielles possibles. Il faut être conscient de tous les scénarios probables afin de pouvoir écrire les règles correspondantes et être sûr d'être averti au maximum de ce qu'il se passe sur notre réseau.
 
 ---
 
