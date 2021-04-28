@@ -392,7 +392,7 @@ sudo snort -c myrules.rules -i eth0
 
 Voici l'alerte personnalisée que je vais utiliser sur le site neverssl.com de la question 5 :
 
-alert tcp any any -> any any (msg:"Il y a le mot webiste"; content:"website"; sid:1000000; rev:1;)
+alert tcp any any -> any any (msg:"Il y a le mot webiste"; content:"website"; sid:4000000; rev:1;)
 
 La première partie lorsqu'on lance le logiciel est l'initialisation. Snort regarde s'il y a des plug-ins, preprocessors et des règles. On voit qu'il a trouvé notre règle personalisée et il nous affiche le chemin du fichier où se trouveront les logs. La règle se trouve bien sur le protocole tcp.
 
@@ -671,7 +671,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-alert icmp any any -> 192.168.1.2 any (itype:8; msg:"Ping received"; sid:4000001; rev:1;)
+alert icmp any any -> 192.168.1.2 any (itype:8; msg:"Ping received"; sid:4000002; rev:1;)
 
 ---
 
@@ -724,11 +724,11 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 Si on veut des *echo-requests* des deux cotés :
 
-alert icmp any any <> 192.168.1.2 any (itype:8; msg:"Ping received"; sid:4000001; rev:2;)
+alert icmp any any <> 192.168.1.2 any (itype:8; msg:"Ping received"; sid:4000002; rev:2;)
 
 Si on veut recevoir les *echo-replies* aussi
 
-alert icmp any any <> 192.168.1.2 any (msg:"Ping received"; sid:4000001; rev:3;)
+alert icmp any any <> 192.168.1.2 any (msg:"Ping received"; sid:4000002; rev:3;)
 
 ---
 
