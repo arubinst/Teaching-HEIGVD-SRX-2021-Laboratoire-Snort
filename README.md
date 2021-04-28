@@ -457,7 +457,7 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 ![](images/01-FichierAlert.png)
 
-- 1ère ligne: Infos de l'alerte que nous avons configuré
+- 1ère ligne: Infos de l'alerte que nous avons configuré, avec le sid, le message et rev.
 - 3ème ligne: Date et heure de la requête, ainsi que ses informations sur la source et le destinataire
 - Dernières lignes: Informations sur le paquet TCP, par exemple la taille des données, l'id du paquet, ...
 
@@ -570,7 +570,7 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 **Réponse :**  
 
-Nous avons remplaceé la flèche unidirectionnelle `->` par une flèche bidirectionnelle `<>`.
+Nous avons remplacé la flèche unidirectionnelle `->` par une flèche bidirectionnelle `<>`.
 
 ![](images/13-icmpreply.png)
 
@@ -592,13 +592,12 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 **Réponse :**  
 
 ````bash
-alert tcp any any -> 192.168.1.2 22 (msg:"SSH Connection";flags:S;sid:4000017;rev:3;)
+alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"SSH Connection";flags:S;sid:4000017;rev:3;)
 ````
 
 La règle alerte toutes les adresses qui essaient de se connecter sur le port 22 (ssh) de l'IDS. Le flags `S` précise les paquets SYN.
 
 ---
-
 
 **Question 15: Montrer le message enregistré dans le fichier d'alertes.** 
 
@@ -606,7 +605,7 @@ La règle alerte toutes les adresses qui essaient de se connecter sur le port 22
 
 **Réponse :**  
 
-ca écrit pas ???!!
+Nous n'avons pas réussi faire fonctionner cette règle. Malgré les services SSH activés nous n'avons reçu aucune alerte. Nous avons vu quelques solutions sur StackOverFlow qui proposaient, entre autres, de changer le port du service sshd sur la machine client, cependant nous n'avons rien pu intercepter.
 
 ---
 
@@ -638,7 +637,7 @@ snort -r nom_fichier.pcap
 
 Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshark que vous venez de générer.
 
-**Question 17: Quelle est le comportement de Snort avec un fichier de capture ? Y-a-t'il une différence par rapport à l'analyse en temps réel ?**
+**Question 17: Quel est le comportement de Snort avec un fichier de capture ? Y-a-t'il une différence par rapport à l'analyse en temps réel ?**
 
 ---
 
@@ -715,7 +714,7 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 **Réponse :**  
 
 ````bash
-alert tcp any any -> 192.168.1.2 22 (msg:"SSH Connection";flags:S;sid:4000018;rev:3;)
+alert tcp any any -> 192.168.1.2 22 (msg:"SSH Connection Frag3";flags:S;sid:4000018;rev:3;)
 ````
 
 ---
@@ -782,7 +781,7 @@ Le préprocesseur est utilisé pour décoder le traffic SSL et TLS.
 
 **Réponse :**  
 
-C'est un module qui permet de détecter et filter les informations personnelles sensibles, telles que les numéros de carte de crédit, les adresses mails, etc...
+C'est un module qui permet de détecter et filtrer les informations personnelles sensibles, telles que les numéros de carte de crédit, les adresses mails, etc...
 
 ---
 
