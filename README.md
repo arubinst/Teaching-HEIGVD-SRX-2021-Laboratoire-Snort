@@ -346,7 +346,9 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :** 
+
+Ils peuvent être utilisés pour examiner des paquets pour une activité suspicieuse ou modifier des paquets pour que snort puisse les interpréter correctement. Ils vont permettre à snort d'analyser le traffic.
 
 ---
 
@@ -355,6 +357,8 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 ---
 
 **Réponse :**  
+
+Parce qu'aucun preprocessor n'a été configuré dans le fichier de règles. Il aurait fallu ajouter des options de préprocesseur dans le fichier `.rules` utilisé. 
 
 ---
 
@@ -372,12 +376,14 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 **Réponse :**  
 
+Toutes les requêtes contenant `Rubinstein` transmises en TCP de et vers n'importe quelle adresse IP et port génèrent une alerte avec le message `Mon nom!`.
+
 ---
 
 Utiliser nano pour créer un fichier `myrules.rules` sur votre répertoire home (```/root```). Rajouter une règle comme celle montrée avant mais avec votre text, phrase ou mot clé que vous aimeriez détecter. Lancer Snort avec la commande suivante :
 
 ```
-sudo snort -c myrules.rules -i eth0
+snort -c myrules.rules -i eth0
 ```
 
 **Question 4: Que voyez-vous quand le logiciel est lancé ? Qu'est-ce que tous ces messages affichés veulent dire ?**
@@ -385,6 +391,10 @@ sudo snort -c myrules.rules -i eth0
 ---
 
 **Réponse :**  
+
+![](images/04.initSnort.png)
+
+Nous voyons que Snort fait toutes ses initialisations; le préprocesseur, les plugins ainsi que les règles qu'il doit lire. Nous constatons que Snort a détecté une règle à lire et effectivement, dans le fichier de règles mis en paramètres, nous n'avons configuré une seule règle. Nous n'avons pas ajouté de règles du préprocesseur alors nous pouvons remarquer que dans l'initialisation de chaînes de règles, il n'y aucune règle de préprocesseur chargée.
 
 ---
 
@@ -396,6 +406,14 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 **Réponse :**  
 
+![](images/03-Client.png)
+
+Cela nous affiche le site au format texte sur le client. Nous pouvons parcourir le site http en totalité, de la même manière que sur un naviguateur.
+
+![](images/02-NoProcessors.png)
+
+Sur la machine IDS, snort nous affiche les warnings du préprocesseur car nous n'avons pas ajouté les options du préprocesseur dans la règle.
+
 ---
 
 Arrêter Snort avec `CTRL-C`.
@@ -405,6 +423,26 @@ Arrêter Snort avec `CTRL-C`.
 ---
 
 **Réponse :**  
+
+![](images/04-FinSnort1.png)
+
+Temps d'activité de snort.
+
+![05-FinSnort2](images/05-FinSnort2.png)
+
+Statistiques de la mémoire utilisée.
+
+![06-FinSnort3](images/06-FinSnort3.png)
+
+Nombre de paquets reçus et analysés.
+
+![07-FinSnort4](images/07-FinSnort4.png)
+
+Statistiques des paquets interceptés/analysés et classé par interface ou protocole.
+
+![08-FinSnort5](images/08-FinSnort5.png)
+
+Résumé de ce qu'il s'est passé.
 
 ---
 
@@ -416,6 +454,12 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 ---
 
 **Réponse :**  
+
+![](images/01-FichierAlert.png)
+
+- 1ère ligne: Infos de l'alerte que nous avons configuré, avec le sid, le message et rev.
+- 3ème ligne: Date et heure de la requête, ainsi que ses informations sur la source et le destinataire
+- Dernières lignes: Informations sur le paquet TCP, par exemple la taille des données, l'id du paquet, ...
 
 ---
 
@@ -432,6 +476,32 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 **Réponse :**  
 
+Premièrement, afin de connaître l'adresse IP de `wikipedia.org`, on peut effectuer la commande `host -t A wikipedia.org` qui nous donne l'adresse IP du site.
+
+La règle que nous avons ajouté:
+
+````bash
+log tcp 192.168.1.3 any -> 91.198.174.192 443 (msg:"Wikipedia"; sid:4000016; rev:1;)
+````
+
+Vu que le message est de type log, le message a été journalisé dans un fichier snort.log.xxxx dans le répertoire `/var/log/snort`. Il est possible de le lire avec deux commandes différentes: 
+
+```bash
+tcpdump -r snort.log.1618654353
+```
+
+![](images/09-tcpdump.png)
+
+Sinon on peut également visualiser le log avec une commande de snort:
+
+````
+snort -r snort.log.1618654353
+````
+
+![](images/10-snortR.png)
+
+Dans les deux captures, on peut voir les informations de la requête du client vers le site wikipedia.org
+
 ---
 
 --
@@ -446,8 +516,11 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
----
+````bash
+alert icmp any any -> 192.168.1.2 any (msg:"ICMP Packet"; sid:4000016; rev:3;)
+````
 
+---
 
 **Question 10: Comment avez-vous fait pour que ça identifie seulement les pings entrants ?**
 
@@ -455,23 +528,33 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+Dans la règle nous avons mis la flèche `->` qui précise que ce sont des requêtes unidirectionnelles qui vont à destination de notre machine IDS.
+
 ---
 
-
 **Question 11: Où le message a-t-il été journalisé ?**
+
+Il a été journalisé dans le fichier  `alert` et il a également été journalisé dans un fichier de log `snort.log.xxxxxxx. 
 
 ---
 
 **Réponse :**  
 
 ---
-
 
 **Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
 
 ---
 
 **Réponse :**  
+
+Dans un fichier de log:
+
+![](images/11-ping1.png)
+
+Dans le fichier alert:
+
+![](images/12-ping2.png)
 
 ---
 
@@ -486,6 +569,12 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 ---
 
 **Réponse :**  
+
+Nous avons remplacé la flèche unidirectionnelle `->` par une flèche bidirectionnelle `<>`.
+
+![](images/13-icmpreply.png)
+
+On peut donc remarquer le protocole icmp avec les paquets `ECHO` et `ECHO REPLY`.
 
 ---
 
@@ -502,14 +591,21 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  
 
----
+````bash
+alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"SSH Connection";flags:S;sid:4000017;rev:3;)
+````
 
+La règle alerte toutes les adresses qui essaient de se connecter sur le port 22 (ssh) de l'IDS. Le flags `S` précise les paquets SYN.
+
+---
 
 **Question 15: Montrer le message enregistré dans le fichier d'alertes.** 
 
 ---
 
 **Réponse :**  
+
+Nous n'avons pas réussi faire fonctionner cette règle. Malgré les services SSH activés nous n'avons reçu aucune alerte. Nous avons vu quelques solutions sur StackOverFlow qui proposaient, entre autres, de changer le port du service sshd sur la machine client, cependant nous n'avons rien pu intercepter.
 
 ---
 
@@ -521,7 +617,7 @@ Depuis l'IDS, servez-vous de l'outil ```tshark```pour capturer du trafic dans un
 
 Pour lancer une capture dans un fichier, utiliser la commande suivante :
 
-```
+```bash
 tshark -w nom_fichier.pcap
 ```
 
@@ -533,15 +629,23 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 **Réponse :**  
 
+````bash
+snort -r nom_fichier.pcap
+````
+
 ---
 
 Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshark que vous venez de générer.
 
-**Question 17: Quelle est le comportement de Snort avec un fichier de capture ? Y-a-t'il une différence par rapport à l'analyse en temps réel ?**
+**Question 17: Quel est le comportement de Snort avec un fichier de capture ? Y-a-t'il une différence par rapport à l'analyse en temps réel ?**
 
 ---
 
 **Réponse :**  
+
+Il l'interprète de la même manière qu'un fichier de log. Il affiche les mêmes informations que lorsqu'on capture l'interface avec snort.
+
+![](images/13-pcap.png)
 
 ---
 
@@ -550,6 +654,8 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 ---
 
 **Réponse :**  
+
+Oui
 
 ---
 
@@ -565,8 +671,13 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
----
+Les deux outils sont utilisés pour la modification du trafic pour que IDS n'arrive pas à les intercepter.
 
+`fragroute` intercepte, modifie et réécrit le trafic sortant destiné à l'hôte spécifié. L'outil est souvent utilisé pour éviter les détections et les alertes des IDS/IPS et il peut également contourner des pare-feux. Il est utilisé pour aider à tester les systèmes de détection d'intrusion dans le réseau, les pare-feu et le comportement de base de la pile TCP/IP.
+
+`fragrouter` est une boîte à outils de détection d'intrusion dans le réseau. 
+
+---
 
 **Question 20: Quel est le principe de fonctionnement ?**
 
@@ -574,14 +685,19 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
----
+`fragroute` utilise un fichier de configuration `fragroute.conf` qui va définir la façon dont l'outil va interragir avec le traffic sortant IP. Il est possible par exemple de fragmenter les paquets envoyés en petits paquets ou également les dupliquer.
 
+`fragrouter` est un routeur de fragmentation à sens unique, c'est-à-dire que les paquets IP sont envoyés par l'attaquant, par exemple, au fragrouter, qui les transforme en un flux de données fragmenté pour les transmettre à la victime.
+
+---
 
 **Question 21: Qu'est-ce que le `Frag3 Preprocessor` ? A quoi ça sert et comment ça fonctionne ?**
 
 ---
 
 **Réponse :**  
+
+C'est un module de défragmentation IP utilisé avec Snort. L'outil va modéliser les cibles réelles sur le réseau au lieu de simplement modéliser les protocoles et de chercher des attaques dans ces protocoles. Ainsi, Snort va pouvoir sécuriser les paquets.
 
 ---
 
@@ -596,6 +712,10 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 ---
 
 **Réponse :**  
+
+````bash
+alert tcp any any -> 192.168.1.2 22 (msg:"SSH Connection Frag3";flags:S;sid:4000018;rev:3;)
+````
 
 ---
 
@@ -619,11 +739,12 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
+Snort n'a pas intercepté la commande nmap; il n'y a aucune alerte dans le fichiers de logs.
+
 ---
 
 
 Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocessor` et refaire la tentative.
-
 
 **Question 24: Quel est le résultat ?**
 
@@ -631,8 +752,18 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
----
+Nous avons ajouté ces deux lignes pour initialiser le préprocesseur frag3:
 
+````bash
+preprocessor frag3_global
+preprocessor frag3_engine
+````
+
+Snort a donc pu intercepter l'alerte:
+
+![](images/14-frag3.png)
+
+---
 
 **Question 25: A quoi sert le `SSL/TLS Preprocessor` ?**
 
@@ -640,8 +771,9 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
----
+Le préprocesseur est utilisé pour décoder le traffic SSL et TLS.
 
+---
 
 **Question 26: A quoi sert le `Sensitive Data Preprocessor` ?**
 
@@ -649,16 +781,19 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
+C'est un module qui permet de détecter et filtrer les informations personnelles sensibles, telles que les numéros de carte de crédit, les adresses mails, etc...
+
 ---
 
 ### Conclusions
-
 
 **Question 27: Donnez-nous vos conclusions et votre opinion à propos de snort**
 
 ---
 
 **Réponse :**  
+
+Snort est un outil très puissant; il permet de sécuriser au maximum un réseau à l'aide de règles. Sa mise en place est plutôt simple, les règles sont un peu plus compliquées à écrire. Mais une fois tout cela mis en place, l'outil est très accessible. Ainsi nous constatons que pour une entreprise qui a besoin de mettre en place son propre IDS, il est facile d'installer Snort.
 
 ---
 
