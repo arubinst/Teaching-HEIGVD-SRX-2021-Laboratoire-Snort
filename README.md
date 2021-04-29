@@ -358,7 +358,6 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
---
 
 ### Trouver du contenu :
 
@@ -386,6 +385,43 @@ sudo snort -c myrules.rules -i eth0
 
 **Réponse :**  
 
+Nous pouvons voir que le fichier que nous avons créé "myrules.rules", contient 1 règle et une chaine d'options.
+
+```
+Running in IDS mode									// Confirm que nous somme en mode IDS
+
+        --== Initializing Snort ==--
+Initializing Output Plugins!
+Initializing Preprocessors!
+Initializing Plug-ins!
+Parsing Rules file "etc/snort/rules/icmp2.rules"
+Tagged Packet Limit: 256
+Log directory = /var/log/snort
+
+// List les regles dans le fichier config
++++++++++++++++++++++++++++++++++++++++++++++++++++	
+Initializing rule chains...
+1 Snort rules read
+    1 detection rules
+    0 decoder rules
+    0 preprocessor rules
+1 Option Chains linked into 1 Chain Headers
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
++-------------------[Rule Port Counts]---------------------------------------
+|             tcp     udp    icmp      ip
+|     src       0       0       0       0
+|     dst       0       0       0       0
+|     any       0       0       1       0
+|      nc       0       0       1       0
+|     s+d       0       0       0       0
++----------------------------------------------------------------------------
+
+```
+
+
+
 ---
 
 Aller à un site web contenant dans son text la phrase ou le mot clé que vous avez choisi (il faudra chercher un peu pour trouver un site en http... Si vous n'y arrivez pas, vous pouvez utiliser [http://neverssl.com](http://neverssl.com) et modifier votre votre règle pour détecter un morceau de text contenu dans le site).
@@ -394,7 +430,9 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ---
 
-**Réponse :**  
+**Réponse :**  wget résout le nom de domain à une(des) adresse(s) IP, se connect au serveur, puis télécharge l'index.html du site
+
+![](images/SRX_SNORT_Q5.png)
 
 ---
 
@@ -405,6 +443,66 @@ Arrêter Snort avec `CTRL-C`.
 ---
 
 **Réponse :**  
+
+Ce sont principalement des stats.
+
+- Temps écoulé, nb de packets
+- Total de packet recu/analysé
+- Somme de packet par protocol
+- Nombre d'actions executé (du à nos règles)
+
+Résultat de snort : 
+
+```bash
+===============================================================================
+Run time for packet processing was 564.601057 seconds
+Snort processed 71 packets.
+Snort ran for 0 days 0 hours 9 minutes 24 seconds
+   Pkts/min:            7
+   Pkts/sec:            0
+===============================================================================
+Packet I/O Totals:
+   Received:           73				# total de packet recu
+   Analyzed:           71 ( 97.260%)	# total de packet analysé
+    Dropped:            0 (  0.000%)
+   Filtered:            0 (  0.000%)
+Outstanding:            2 (  2.740%)	# Total de packet bufferisé
+   Injected:            0
+===============================================================================
+Breakdown by protocol (includes rebuilt packets):
+        Eth:           71 (100.000%)
+        IP4:           60 ( 84.507%)
+        TCP:           60 ( 84.507%)
+        IP6:            1 (  1.408%)
+    IP6 Ext:            1 (  1.408%)
+       UDP6:            1 (  1.408%)
+        ARP:           10 ( 14.085%)
+Bad Chk Sum:           33 ( 46.479%)
+      Total:           71
+===============================================================================
+Action Stats:
+     Alerts:            4 (  5.634%)
+     Logged:            4 (  5.634%)
+     Passed:            0 (  0.000%)
+Limits:
+      Match:            0
+      Queue:            0
+        Log:            0
+      Event:            0
+      Alert:            0
+Verdicts:
+      Allow:           71 ( 97.260%)
+      Block:            0 (  0.000%)
+    Replace:            0 (  0.000%)
+  Whitelist:            0 (  0.000%)
+  Blacklist:            0 (  0.000%)
+     Ignore:            0 (  0.000%)
+      Retry:            0 (  0.000%)
+===============================================================================
+Snort exiting
+```
+
+
 
 ---
 
@@ -417,14 +515,48 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 **Réponse :**  
 
+1. Id + msg définit dans la règle
+2. La priorité de l'alerte
+3. Timestamp / IP:port src -> IP:port dst
+4. Protocol 
+5. Détails sur le packet
+
+```bash
+[**] [1:4000015:1] Attention! [**]
+[Priority: 0] 
+04/29-12:51:46.916682 13.225.84.88:80 -> 192.168.1.2:57486
+TCP TTL:63 TOS:0x0 ID:27990 IpLen:20 DgmLen:1148
+***AP*** Seq: 0xAC3E37B  Ack: 0x82A6E4A  Win: 0xFFFF  TcpLen: 20
+
+[**] [1:4000015:1] Attention! [**]
+[Priority: 0] 
+04/29-12:51:46.916689 13.225.84.88:80 -> 192.168.1.3:57486
+TCP TTL:62 TOS:0x0 ID:27990 IpLen:20 DgmLen:1148
+***AP*** Seq: 0xAC3E37B  Ack: 0x82A6E4A  Win: 0xFFFF  TcpLen: 20
+
+[**] [1:4000015:1] Attention! [**]
+[Priority: 0] 
+04/29-12:52:22.794924 13.225.84.121:80 -> 192.168.1.2:34262
+TCP TTL:63 TOS:0x0 ID:27999 IpLen:20 DgmLen:1148
+***AP*** Seq: 0xAC5D77B  Ack: 0xA742B6DC  Win: 0xFFFF  TcpLen: 20
+
+[**] [1:4000015:1] Attention! [**]
+[Priority: 0] 
+04/29-12:52:22.794928 13.225.84.121:80 -> 192.168.1.3:34262
+TCP TTL:62 TOS:0x0 ID:27999 IpLen:20 DgmLen:1148
+***AP*** Seq: 0xAC5D77B  Ack: 0xA742B6DC  Win: 0xFFFF  TcpLen: 20
+```
+
+
+
 ---
 
 
---
+
 
 ### Detecter une visite à Wikipedia
 
-Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wikipedia est visité **SPECIFIQUEMENT DEPUIS VOTRE MACHINE CLIENT**. Ne pas utiliser une règle qui détecte un string ou du contenu**.
+Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wikipedia est visité **SPECIFIQUEMENT DEPUIS VOTRE MACHINE CLIENT. Ne pas utiliser une règle qui détecte un string ou du contenu**.
 
 **Question 8: Quelle est votre règle ? Où le message a-t'il été journalisé ? Qu'est-ce qui a été journalisé ?**
 
@@ -432,9 +564,22 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 **Réponse :**  
 
----
+Règle :  `log tcp 192.168.1.3 any -> 91.198.174.192 any`
 
---
+Où : Dans /var/log/snort
+
+Quoi : Les packets TCP de 192.168.1.3 vers 91.198.174.192:443
+
+Exemple :
+
+```
+04/29-15:50:12.716224 192.168.1.3:39266 -> 91.198.174.192:443
+TCP TTL:64 TOS:0x0 ID:62584 IpLen:20 DgmLen:557 DF
+***AP*** Seq: 0x17037091  Ack: 0xD9A6C02  Win: 0xFAF0  TcpLen: 20
+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+```
+
+---
 
 ### Détecter un ping d'un autre système
 
@@ -444,16 +589,15 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+**Réponse :**  `alert icmp !192.168.1.2 any -> 192.168.1.2 any (msg:"ICMP Packet";itype:8; sid:4000001;)`
 
 ---
-
 
 **Question 10: Comment avez-vous fait pour que ça identifie seulement les pings entrants ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**   On a exclut l'adresse de l'IDS et on séléctionne seulement les echo (ICMP type 8)
 
 ---
 
@@ -462,20 +606,19 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+**Réponse :**  dans /var/snort/log/alert et /var/snort/log/snort.log.....
 
 ---
-
 
 **Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
 
 ---
 
-**Réponse :**  
+**Réponse :**  Seul les ping vers l'IDS et pas les reply
+
+![images/SRX_SNORT_Q12.png](images/SRX_SNORT_Q12.png)
 
 ---
-
---
 
 ### Detecter les ping dans les deux sens
 
@@ -485,12 +628,12 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 ---
 
-**Réponse :**  
+**Réponse :**  `alert icmp 192.168.1.2 any <> 192.168.1.3 any (msg:"ICMP Packet"; sid:4000001;)`
 
 ---
 
 
---
+
 
 ### Detecter une tentative de login SSH
 
