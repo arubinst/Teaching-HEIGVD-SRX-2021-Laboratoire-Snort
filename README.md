@@ -2,6 +2,8 @@
 
 **Ce travail de laboratoire est à faire en équipes de 2 personnes**
 
+Auteurs : Nicolas Ogi, Nicolas Viotti
+
 **ATTENTION : Commencez par créer un Fork de ce repo et travaillez sur votre fork.**
 
 Clonez le repo sur votre machine. Vous pouvez répondre aux questions en modifiant directement votre clone du README.md ou avec un fichier pdf que vous pourrez uploader sur votre fork.
@@ -121,6 +123,8 @@ Pour permettre à votre machine Client de contacter l'Internet à travers la mac
 ```bash
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
+
+**Remarque** : J'ai dû utiliser `iptables-legacy` pour que cette commande fonctionne sur le WSL (sur une VM Kali pas besoin).
 
 Cette commande `iptables` définit une règle dans le tableau NAT qui permet la redirection de ports et donc, l'accès à l'Internet pour la machine Client.
 
@@ -346,7 +350,9 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Ils permettent d'étendre la fonctionnalité de Snort en donnant la possibilité aux utilisateurs et aux développeurs d'y intégrer assez facilement des plugins modulaires. Le code du préprocesseur est exécuté avant l'appel du moteur de détection (L'IDS dans le cadre de ce laboratoire), mais après le décodage du paquet. Grâce à ce mécanisme, le paquet peut être modifié ou analysé de manière hors bande.
+
+Par exemple, certains préprocesseurs permettent d'examiner des paquets qui tentent d'échapper au système de détection. (*Frag3* qui est un module de défragmentation "target-based").
 
 ---
 
@@ -354,7 +360,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse :**  Car nous n'avons pas configuré de préprocesseurs pour notre fichier de règles ou de configuration "fait-maison".
 
 ---
 
@@ -370,7 +376,8 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  
+**Réponse :**  Une alerte va être générée et la paquet l'ayant créée sera journalisé. Elle concerne tout le trafic peu importe d'où il vient et peu importe où il va (mais seulement monodirectionnel). L'alerte contiendra le message "Mon nom!" et elle ne sera créée que si le paquet contient la string "Rubinstein". 
+Le *sid* nous indique qu'il s'agit d'une règle ajoutée par l'utilisateur (car > 1000000) et qu'il s'agit de la version 1 selon ce qu'indique l'option *rev*.
 
 ---
 
@@ -386,6 +393,99 @@ sudo snort -c myrules.rules -i eth0
 
 **Réponse :**  
 
+```
+Running in IDS mode
+
+        --== Initializing Snort ==--
+Initializing Output Plugins!
+Initializing Preprocessors!
+Initializing Plug-ins!
+Parsing Rules file "root/myrules.rules"
+Tagged Packet Limit: 256
+Log directory = /var/log/snort
+```
+
+D'abord, on peut observer que Snort démarre en initialisant les plugins et les préprocesseurs. Les rules sont détectées dans le fichier *myrules.rules* et le chemin du dossier qui contiendra les logs est affiché.
+
+```
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Initializing rule chains...
+1 Snort rules read
+    1 detection rules
+    0 decoder rules
+    0 preprocessor rules
+1 Option Chains linked into 1 Chain Headers
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++-------------------[Rule Port Counts]---------------------------------------
+|             tcp     udp    icmp      ip
+|     src       0       0       0       0
+|     dst       0       0       0       0
+|     any       1       0       0       0
+|      nc       0       0       0       0
+|     s+d       0       0       0       0
++----------------------------------------------------------------------------
+
++-----------------------[detection-filter-config]------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[detection-filter-rules]-------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[rate-filter-config]-----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[rate-filter-rules]------------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[event-filter-config]----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[event-filter-global]----------------------------------
++-----------------------[event-filter-local]-----------------------------------
+| none
++-----------------------[suppression]------------------------------------------
+| none
+-------------------------------------------------------------------------------
+Rule application order: pass->drop->sdrop->reject->alert->log
+Verifying Preprocessor Configurations!
+
+[ Port Based Pattern Matching Memory ]
++-[AC-BNFA Search Info Summary]------------------------------
+| Instances        : 1
+| Patterns         : 1
+| Pattern Chars    : 6
+| Num States       : 6
+| Num Match States : 1
+| Memory           :   1.58Kbytes
+|   Patterns       :   0.04K
+|   Match Lists    :   0.08K
+|   Transitions    :   1.06K
++-------------------------------------------------
+pcap DAQ configured to passive.
+Acquiring network traffic from "eth0".
+Reload thread starting...
+Reload thread started, thread 0x7feeaedd5700 (1309)
+Decoding Ethernet
+```
+
+Cette partie indique qu'une rule de détection a été trouvée et indique aussi diverses informations concernant la configuration, notamment l'interface sur laquelle le trafic est écouté.
+```
+        --== Initialization Complete ==--
+
+   ,,_     -*> Snort! <*-
+  o"  )~   Version 2.9.15.1 GRE (Build 15125)
+   ''''    By Martin Roesch & The Snort Team: http://www.snort.org/contact#team
+           Copyright (C) 2014-2019 Cisco and/or its affiliates. All rights reserved.
+           Copyright (C) 1998-2013 Sourcefire, Inc., et al.
+           Using libpcap version 1.10.0 (with TPACKET_V3)
+           Using PCRE version: 8.39 2016-06-14
+           Using ZLIB version: 1.2.11
+
+Commencing packet processing (pid=1308)
+```
+
+Cette dernière partie nous indique que l'initialisation est terminée et l'analyse de paquets peut commencer.
+
 ---
 
 Aller à un site web contenant dans son text la phrase ou le mot clé que vous avez choisi (il faudra chercher un peu pour trouver un site en http... Si vous n'y arrivez pas, vous pouvez utiliser [http://neverssl.com](http://neverssl.com) et modifier votre votre règle pour détecter un morceau de text contenu dans le site).
@@ -394,7 +494,7 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ---
 
-**Réponse :**  
+**Réponse :**  Depuis la machine client, rien de spécial ne se passe, la page du site est simplement chargée et affichée (avec la commande `lynx`) . Par contre sur l'IDS, plusieurs lignes `WARNING: No preprocessors configured for policy 0.` se sont affichées au moment de se connecter au site ce qui indique que du trafic a été détecté.
 
 ---
 
@@ -405,6 +505,102 @@ Arrêter Snort avec `CTRL-C`.
 ---
 
 **Réponse :**  
+
+```
+===============================================================================
+Run time for packet processing was 451.182229 seconds
+Snort processed 41 packets.
+Snort ran for 0 days 0 hours 7 minutes 31 seconds
+   Pkts/min:            5
+   Pkts/sec:            0
+===============================================================================
+Memory usage summary:
+  Total non-mmapped bytes (arena):       4096000
+  Bytes in mapped regions (hblkhd):      30265344
+  Total allocated space (uordblks):      3345680
+  Total free space (fordblks):           750320
+  Topmost releasable block (keepcost):   592800
+===============================================================================
+Packet I/O Totals:
+   Received:           41
+   Analyzed:           41 (100.000%)
+    Dropped:            0 (  0.000%)
+   Filtered:            0 (  0.000%)
+Outstanding:            0 (  0.000%)
+   Injected:            0
+===============================================================================
+Breakdown by protocol (includes rebuilt packets):
+        Eth:           41 (100.000%)
+       VLAN:            0 (  0.000%)
+        IP4:           36 ( 87.805%)
+       Frag:            0 (  0.000%)
+       ICMP:            0 (  0.000%)
+        UDP:           16 ( 39.024%)
+        TCP:           20 ( 48.780%)
+        IP6:            1 (  2.439%)
+    IP6 Ext:            1 (  2.439%)
+   IP6 Opts:            0 (  0.000%)
+      Frag6:            0 (  0.000%)
+      ICMP6:            1 (  2.439%)
+       UDP6:            0 (  0.000%)
+       TCP6:            0 (  0.000%)
+     Teredo:            0 (  0.000%)
+    ICMP-IP:            0 (  0.000%)
+    IP4/IP4:            0 (  0.000%)
+    IP4/IP6:            0 (  0.000%)
+    IP6/IP4:            0 (  0.000%)
+    IP6/IP6:            0 (  0.000%)
+        GRE:            0 (  0.000%)
+    GRE Eth:            0 (  0.000%)
+   GRE VLAN:            0 (  0.000%)
+    GRE IP4:            0 (  0.000%)
+    GRE IP6:            0 (  0.000%)
+GRE IP6 Ext:            0 (  0.000%)
+   GRE PPTP:            0 (  0.000%)
+    GRE ARP:            0 (  0.000%)
+    GRE IPX:            0 (  0.000%)
+   GRE Loop:            0 (  0.000%)
+       MPLS:            0 (  0.000%)
+        ARP:            4 (  9.756%)
+        IPX:            0 (  0.000%)
+   Eth Loop:            0 (  0.000%)
+   Eth Disc:            0 (  0.000%)
+   IP4 Disc:            0 (  0.000%)
+   IP6 Disc:            0 (  0.000%)
+   TCP Disc:            0 (  0.000%)
+   UDP Disc:            0 (  0.000%)
+  ICMP Disc:            0 (  0.000%)
+All Discard:            0 (  0.000%)
+      Other:            0 (  0.000%)
+Bad Chk Sum:           26 ( 63.415%)
+    Bad TTL:            0 (  0.000%)
+     S5 G 1:            0 (  0.000%)
+     S5 G 2:            0 (  0.000%)
+      Total:           41
+===============================================================================
+Action Stats:
+     Alerts:            2 (  4.878%)
+     Logged:            2 (  4.878%)
+     Passed:            0 (  0.000%)
+Limits:
+      Match:            0
+      Queue:            0
+        Log:            0
+      Event:            0
+      Alert:            0
+Verdicts:
+      Allow:           41 (100.000%)
+      Block:            0 (  0.000%)
+    Replace:            0 (  0.000%)
+  Whitelist:            0 (  0.000%)
+  Blacklist:            0 (  0.000%)
+     Ignore:            0 (  0.000%)
+      Retry:            0 (  0.000%)
+===============================================================================
+Snort exiting
+```
+
+Au début Snort nous indique combien de paquets ont été analysés et pendant combien de temps l'analyse a duré. Ensuite, il nous informe de l'utilisation mémoire et du nombre de paquets reçus et analysés dans la section juste en-dessous. Puis, est affiché une liste plus détaillée des paquets analysés, triée selon le protocole du paquet. Et finalement la dernière section nous indique les actions engendrées par cette analyse.
 
 ---
 
@@ -417,8 +613,22 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 **Réponse :**  
 
----
+```
+[**] [1:4000015:1] Premier site web du monde [**]
+[Priority: 0]
+04/08-15:32:28.033276 188.184.21.108:80 -> 192.168.1.2:40044
+TCP TTL:37 TOS:0x0 ID:59647 IpLen:20 DgmLen:918
+***AP*** Seq: 0x1AFE3218  Ack: 0xC5B23C93  Win: 0xFFFF  TcpLen: 20
+```
 
+On ne le voit pas dans les alertes mais le mot-clé choisi était "CERN" et le site utilisé était info.cern.ch
+
+La première ligne nous indique le message que nous voulions afficher dans l'alerte lors de la configuration de la règle.
+La seconde ligne représente la catégorie (classType) pouvant être utilisée pour définir la sévérité.
+La troisième ligne contient la date et l'heure de l'alerte ainsi que l'IP et port sources et l'IP et port destinations.
+Les deux lignes restantes représentent des informations techniques sur la paquet TCP ayant généré l'alerte.
+
+---
 
 --
 
@@ -432,6 +642,13 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 **Réponse :**  
 
+La règle créée est la suivante : `log tcp 192.168.1.3 any -> 91.198.174.192 [80,443]`
+Elle journalise sans alerter (grâce à `log`) les visites depuis la machine client (192.168.1.3) depuis n'importe quel port source à l'adresse 91.198.174.192 sur les ports 80 (HTTP) et 443 (HTTPS) représentant le site www.wikipedia.org. Les paquets ont été journalisés dans un fichier snort.log.xxxxxxxxxx situé dans le dossier `/var/log/snort`.
+
+![image-20210408194210005](img/image-20210408194210005.png)
+
+Avec l'outil `tcpdump` ou Wireshark, on peut voir le paquet qui a été journalisé, en provenance du client vers un serveur de Wikipedia. On peut aussi voir l'heure à laquelle il a été journalisé et quels ports ont été empruntés.
+
 ---
 
 --
@@ -444,7 +661,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+**Réponse :**  `alert icmp any any -> 192.168.1.2 any (itype: 8; msg: "ICMP Echo Request"; sid:4000016; rev:1;)`
 
 ---
 
@@ -453,7 +670,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+**Réponse :**  En définissant l'option `itype: 8`, qui permet de n'identifier que les *echo-requests*.
 
 ---
 
@@ -462,7 +679,7 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 ---
 
-**Réponse :**  
+**Réponse :**  Le message a été journalisé dans le fichier *alert* et les paquets vérifiant la règles ont aussi été enregistrés dans un fichier snort.log.xxxxxxxxxx dans le dossier `/var/log/snort`.
 
 ---
 
@@ -472,6 +689,10 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 ---
 
 **Réponse :**  
+
+![image-20210408200501090](img/image-20210408200501090.png)
+
+On peut observer que seuls les *echo-requests* en provenance de la machine client vers l'IDS ont été journalisés.
 
 ---
 
@@ -485,7 +706,17 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 ---
 
-**Réponse :**  
+**Réponse :** 
+
+Puisque il y a une ambiguïté concernant la détection de trafic dans les deux sens, nous avons fourni deux réponses : 
+
+Si l'on veut détecter aussi les *echo-replies*, il faut aussi supprimer l'option `itype : 8` de la règle précédente et mettre l'opérateur bidirectionnel  `<>` :
+
+`alert icmp any any <> 192.168.1.2 any (msg: "ICMP Echo Request/Reply"; sid:4000016; rev:1;)`
+
+Si l'on souhaite aussi détecter l'ouverture d'une communication par l'IDS on inverse la source et la destination en ajoutant la règle ci-dessous à la suite de celle créée à la question 9  : 
+
+`alert icmp 192.168.1.2 any -> any any (itype: 8; msg: "ICMP Echo Request"; sid:4000016; rev:1;)`
 
 ---
 
@@ -500,7 +731,9 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Réponse :**  
+**Réponse :**  `alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"SSH Connection detected"; content:"SSH-"; nocase; sid:4000017; rev:1;)`
+
+Elle permet de détecter des connexions venant de la machine client, peu importe le port source, sur l'IDS via le port 22 (SSH). Elle affiche une alerte contenant le message "SSH Connection detected" si le contenu du paquet contient la string "SSH-" en minuscule ou en majuscule (option `nocase`).  Concernant le contenu du paquet, après quelques recherches, les paquets de connexion possèdent la version de SSH employée (par exemple SSH-2.0) d'où l'ajout de l'option `content` dans la règle.
 
 ---
 
@@ -509,7 +742,7 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Réponse :**  
+**Réponse :**  Bizarrement Snort ne met rien dans le fichier *alert* et crée un fichier snort.log.xxxxxxxxxx vide. Même en ayant tester Snort sur une VM Kali dans le cas où le problème viendrait du WSL, même résultat... Discussion sur Teams avec M. Rubinstein concernant ce problème. Comme dernière tentative, nous avons essayé de modifier le port d'écoute de ssh (22 -> 2222), de supprimer la liste des hôtes connus du côté Client et aussi d'utiliser la commande `scp` pour générer du trafic ssh en ayant au préalable simplifié la règle : `alert tcp 192.168.1.3 any -> 192.168.1.2 2222 (msg:"SSH Connection detected"; sid:4000018; rev:1;)` mais rien n'a fonctionné, les fichiers restent vides...
 
 ---
 
@@ -531,7 +764,7 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 ---
 
-**Réponse :**  
+**Réponse :**  C'est l'option `-r` qui permet de renseigner des fichiers pcap ou log en plus de l'option `-c` avec le fichier de rules.
 
 ---
 
@@ -541,7 +774,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Il manque les rubriques *Action Stats*, *Limits* et *Verdicts* dans le rapport de Snort. Une autre différence est que lorsqu'il a fini de le lire, il s'arrête. Alors que lors d'une analyse en temps réel, c'est à nous de l'arrêter.
 
 ---
 
@@ -549,7 +782,9 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse :**  Oui le résultat dans le fichier *alert* ne diffère pas du résultat que l'on obtient avec une analyse temps-réel.
+
+![image-20210422145752825](img/image-20210422145752825.png)
 
 ---
 
@@ -563,16 +798,15 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+**Réponse :**  `fragroute` permet d'intercepter, modifier et réécrire le trafic de sortie destiné à un hôte spécifié. Alors que `fragrouter` est un kit d'outils d'évasion de détection d'intrusion dans le réseau (pour échapper aux NIDS).
 
 ---
-
 
 **Question 20: Quel est le principe de fonctionnement ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**  Ils vont principalement fragmenter les paquets, les dupliquer, les réordonner, ceci afin d'éviter une détection.
 
 ---
 
@@ -581,7 +815,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+**Réponse :**  C'est un module de défragmentation de paquets qui permet justement de contrer les outils cités plus haut. Il arrive à rassembler les paquets comme il veut, sans dépendre de l'OS. L'idée d'un système basé sur les cibles (target-based) est de modéliser les cibles réelles sur le réseau au lieu de se contenter de modéliser les protocoles et de rechercher les attaques à l'intérieur de ceux-ci.
 
 ---
 
@@ -596,6 +830,12 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 ---
 
 **Réponse :**  
+
+```
+alert tcp any any -> 192.168.1.2 22 (flags:S; msg:"SYN Scan"; sid: 4000018; rev:1;)
+```
+
+
 
 ---
 
@@ -619,17 +859,39 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
+Snort a bien détecté le premier scan sans fragmentation : 
+
+```
+[**] [1:4000018:1] SYN Scan [**]
+[Priority: 0]
+04/15-12:17:21.737239 192.168.1.3:64872 -> 192.168.1.2:22
+TCP TTL:57 TOS:0x0 ID:64064 IpLen:20 DgmLen:44
+******S* Seq: 0xC7C92EA3  Ack: 0x0  Win: 0x400  TcpLen: 24
+TCP Options (1) => MSS: 1460
+```
+
+Cependant, le deuxième est passé entre les mailles du filet.
+
 ---
 
 
-Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocessor` et refaire la tentative.
+Modifier le fichier `myrules.rules` pour que Snort utiliser le `Frag3 Preprocessor` et refaire la tentative.
 
 
 **Question 24: Quel est le résultat ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**  Le SYN scan a bien été détecté.
+
+```
+[**] [1:4000018:1] SYN Scan [**]
+[Priority: 0]
+04/15-12:28:18.038203 192.168.1.3:64751 -> 192.168.1.2:22
+TCP TTL:53 TOS:0x0 ID:51725 IpLen:20 DgmLen:44
+******S* Seq: 0xCEBF607B  Ack: 0x0  Win: 0x400  TcpLen: 24
+TCP Options (1) => MSS: 1460
+```
 
 ---
 
@@ -638,16 +900,15 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  Il permet d'inspecter le trafic SSL et, comme c'est une opération coûteuse, il est possible de déterminer dans Snort à quel moment stopper l'inspection. Il est capable d'inspecter des paquets SSL car une portion de ceux-ci n'est pas chiffrée et permette d'obtenir des informations sur le trafic lui-même (notamment dans le handshake SSL).
 
 ---
-
 
 **Question 26: A quoi sert le `Sensitive Data Preprocessor` ?**
 
 ---
 
-**Réponse :**  
+**Réponse :**  Il permet la détection et le filtrage de données sensibles comme les numéros de cartes de crédit, les numéros de sécurité sociale et les adresses mails. 
 
 ---
 
@@ -658,13 +919,12 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse :**  C'est un outil très complet qui permet de mettre en place des règles complexes et comme il est open source, il est possible de compter sur la communauté pour nous fournir des configurations pré-faites efficaces. Il était intéressant de le prendre en main pour avoir une introduction sur comment fonctionnent les IDS. Cependant, ayant eu des problèmes concernant la détection de certains trafics en ayant configuré des règles pourtant simples, nous nous interrogeons sur sa fiabilité. 
 
 ---
 
 ### Cleanup
 
 Pour nettoyer votre système et effacer les fichiers générés par Docker, vous pouvez exécuter le script [cleanup.sh](scripts/cleanup.sh). **ATTENTION : l'effet de cette commande est irréversible***.
-
 
 <sub>This guide draws heavily on http://cs.mvnu.edu/twiki/bin/view/Main/CisLab82014</sub>
