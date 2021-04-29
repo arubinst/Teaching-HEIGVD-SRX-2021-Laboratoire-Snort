@@ -2,6 +2,8 @@
 
 **Ce travail de laboratoire est à faire en équipes de 2 personnes**
 
+Auteurs : Nicolas Ogi, Nicolas Viotti
+
 **ATTENTION : Commencez par créer un Fork de ce repo et travaillez sur votre fork.**
 
 Clonez le repo sur votre machine. Vous pouvez répondre aux questions en modifiant directement votre clone du README.md ou avec un fichier pdf que vous pourrez uploader sur votre fork.
@@ -624,7 +626,7 @@ On ne le voit pas dans les alertes mais le mot-clé choisi était "CERN" et le s
 La première ligne nous indique le message que nous voulions afficher dans l'alerte lors de la configuration de la règle.
 La seconde ligne représente la catégorie (classType) pouvant être utilisée pour définir la sévérité.
 La troisième ligne contient la date et l'heure de l'alerte ainsi que l'IP et port sources et l'IP et port destinations.
-Les deux lignes restantes représentent des informations sur la paquet TCP ayant généré l'alerte.
+Les deux lignes restantes représentent des informations techniques sur la paquet TCP ayant généré l'alerte.
 
 ---
 
@@ -704,15 +706,17 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 
 ---
 
-**Réponse :**  
+**Réponse :** 
 
-Pour ne détecter que les *echo-requests* mais dans les deux sens cette fois, il faut remplacer l'opérateur de direction.
+Puisque il y a une ambiguïté concernant la détection de trafic dans les deux sens, nous avons fourni deux réponses : 
 
-`alert icmp any any <> 192.168.1.2 any (itype: 8; msg: "ICMP Echo Request"; sid:4000016; rev:1;)`
-
-Mais si l'on veut détecter aussi les *echo-replies*, il faut aussi supprimer l'option `itype : 8`.
+Si l'on veut détecter aussi les *echo-replies*, il faut aussi supprimer l'option `itype : 8` de la règle précédente et mettre l'opérateur bidirectionnel  `<>` :
 
 `alert icmp any any <> 192.168.1.2 any (msg: "ICMP Echo Request/Reply"; sid:4000016; rev:1;)`
+
+Si l'on souhaite aussi détecter l'ouverture d'une communication par l'IDS on inverse la source et la destination en ajoutant la règle ci-dessous à la suite de celle créée à la question 9  : 
+
+`alert icmp 192.168.1.2 any -> any any (itype: 8; msg: "ICMP Echo Request"; sid:4000016; rev:1;)`
 
 ---
 
@@ -770,7 +774,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  Il n'y a pas vraiment de différence, il démarre de la même manière et lit le fichier de capture. Sauf que là lorsqu'il a fini de le lire, il s'arrête. Alors que lors d'une analyse en temps réel, c'est à nous de l'arrêter.
+**Réponse :**  Il manque les rubriques *Action Stats*, *Limits* et *Verdicts* dans le rapport de Snort. Une autre différence est que lorsqu'il a fini de le lire, il s'arrête. Alors que lors d'une analyse en temps réel, c'est à nous de l'arrêter.
 
 ---
 
@@ -797,7 +801,6 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 **Réponse :**  `fragroute` permet d'intercepter, modifier et réécrire le trafic de sortie destiné à un hôte spécifié. Alors que `fragrouter` est un kit d'outils d'évasion de détection d'intrusion dans le réseau (pour échapper aux NIDS).
 
 ---
-
 
 **Question 20: Quel est le principe de fonctionnement ?**
 
@@ -872,7 +875,7 @@ Cependant, le deuxième est passé entre les mailles du filet.
 ---
 
 
-Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocessor` et refaire la tentative.
+Modifier le fichier `myrules.rules` pour que Snort utiliser le `Frag3 Preprocessor` et refaire la tentative.
 
 
 **Question 24: Quel est le résultat ?**
@@ -901,12 +904,11 @@ TCP Options (1) => MSS: 1460
 
 ---
 
-
 **Question 26: A quoi sert le `Sensitive Data Preprocessor` ?**
 
 ---
 
-**Réponse :**  Il permet la détection et le filtrage de données sensibles comme les numéros de cartes de crédit, les numéros de sécurité sociale et les adresses mails.
+**Réponse :**  Il permet la détection et le filtrage de données sensibles comme les numéros de cartes de crédit, les numéros de sécurité sociale et les adresses mails. 
 
 ---
 
@@ -924,6 +926,5 @@ TCP Options (1) => MSS: 1460
 ### Cleanup
 
 Pour nettoyer votre système et effacer les fichiers générés par Docker, vous pouvez exécuter le script [cleanup.sh](scripts/cleanup.sh). **ATTENTION : l'effet de cette commande est irréversible***.
-
 
 <sub>This guide draws heavily on http://cs.mvnu.edu/twiki/bin/view/Main/CisLab82014</sub>
