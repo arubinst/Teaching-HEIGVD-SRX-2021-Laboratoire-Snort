@@ -541,7 +541,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse : la seule différence est que l'analyse d'un fichier s'arrête à la fin de celui-ci alors que l'analyse en temps réel doit-être arrêtée manuellement.**  
 
 ---
 
@@ -549,7 +549,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Réponse :**  
+**Réponse : Oui les alertes sont également enregistrées dans le fichier d'alertes**  
 
 ---
 
@@ -621,7 +621,7 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 ---
 
-**Réponse :**  
+**Réponse : snort détecte bien le premier scan mais il ne détecte pas la version fragmentée**  
 
 ---
 
@@ -633,7 +633,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse : une fois la configuration effectuée, le scan fragmenté est bien detecté**  
 
 ---
 
