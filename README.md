@@ -346,7 +346,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse : les preprocesseurs ont plusieurs fonctions avec snort. Ils servent par exemple à normaliser le traffic ou repérer des attaques qui passent à travers un capter NIDS. ils augmentent aussi les capacités de snort à repérer les intrusions réseau qui ne seraient pas spécifiées dans les règles. Les preprocesseur traitent les données avant le moteur de détection, mais après le décodage du paquet.**  
 
 ---
 
@@ -354,7 +354,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-**Réponse :**  
+**Réponse : C'est du au fait qu'aucun preprocesseur n'a été configuré pour le fichier de règles/configuration "fait-maison"**  
 
 ---
 
@@ -370,7 +370,7 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-**Réponse :**  
+**Réponse : Elle va enregister une alerte si un paquet reçu par traffic tcp contient un string avec à l'intérieur "Rubinstein". L'adresse source et destination n'importe pas. L'alerte enregistrée contiendra le message "Mon nom!". Le paramètre rev indique le numéro de la révision (ici c'est la première version car rev est à 1) et le paramètre sid représente un numéro d'identification unique.**  
 
 ---
 
