@@ -527,13 +527,13 @@ Arrêter Snort avec `CTRL-C`.
 
 **Partie 4** : Filtrage des différentes paquets par protocole
 
-![image-20210429100245197](.\images\image-20210429100245197.png)
+![image-20210429100245197](./images/image-20210429100245197.png)
 
 
 
 **Partie 5** : Actions sur les paquets en fonction des règles.
 
-![image-20210429100312832](.\images\image-20210429100312832.png)
+![image-20210429100312832](./images/image-20210429100312832.png)
 
 Il est bon de noter que la règle utilité ci-dessus n'est pas la même que celle que nous avions créé avec un filtre sur notre nom, car il nous a été impossible d'arrêter Snort sans le `kill -9 sid`, sauf une fois où cela a fonctionner, pour une autre règle.
 
@@ -548,7 +548,7 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 **Réponse :**  
 
-![image-20210429131816792](.\images\image-20210429131816792.png)
+![image-20210429131816792](./images/image-20210429131816792.png)
 
 **Ligne 1 :** Nom de la règle activée
 
@@ -583,7 +583,7 @@ Comme cette règle va générer une log, alors elle sera enregistrée dans le do
 
 **Quoi :**
 
-![image1](.\images\image1.PNG)
+![image1](./images/image1.PNG)
 
 On voit donc qu'il y a un bien eu une visite effectué sur ce log de la part du client vers le serveur https de Wikipédia.
 
@@ -632,11 +632,11 @@ alert icmp any any -> 192.168.1.2 any (itype: 8; msg:"PING OVER IDS"; sid:400004
 
 **Avec cat dans le fichier d'alerte :** Cela permet de voir plus facilement que l'alerte est bien générée
 
-![image3](.\images\image3.PNG)
+![image3](./images/image3.PNG)
 
 **Avec `tshark -r` dans le fichier de log : **
 
-![image4](.\images\image4.PNG)
+![image4](./images/image4.PNG)
 
 On voit grâce à `tshark -r`, une information plus détaillée sur les paquets qui ont étés remarqué, car la structure est linéaire et plus intuitive. On trouve les informations suivantes qui ont été journalisé par colonne : 
 
@@ -721,7 +721,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 **Réponse :**   L'affichage de snort avec un fichier de capture est identique qu'avec un fichier de log, car il analyse à nouveau le contenu. Il n'a aura pas d'éléments trié (partie `Packet I/O Totals`) car il n'y a pas de filtres sur une capture.
 
-![image-20210429105654252](.\images\image-20210429105654252.png)
+![image-20210429105654252](./images/image-20210429105654252.png)
 
 ---
 
@@ -827,7 +827,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  Cette fois-ci, l'IDS a bien pu identifier le SYN. (fichier alert)
 
-![image-20210429114814789](.\images\image-20210429114814789.png)
+![image-20210429114814789](./images/image-20210429114814789.png)
 
 ---
 
