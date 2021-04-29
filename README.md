@@ -493,7 +493,7 @@ Du côté client on fait :
 
 Avec `wget http://www.nukmed.insel.ch/de/ueber-uns/unser-team/klinikleitung/prof-dr-med-axel-rominger/` on a accès à une page avec le mot `axel`, et on la télécharge comme ça. 
 
-![image2](.\images\image2.PNG)
+![image2](./images/image2.PNG)
 
 Du côté serveur on a : 
 
@@ -511,19 +511,19 @@ Arrêter Snort avec `CTRL-C`.
 
 **Partie 1 **: temps d'execution de snort et le nombre de paquet totals et par seconde.
 
-![image5](.\images\image5.PNG)
+![image5](./images/image5.PNG)
 
 
 
 **Partie 2** : résumé des utilisations des ressources du système
 
-![image-20210429100056315](.\images\image-20210429100056315.png)
+![image-20210429100056315](./images/image-20210429100056315.png)
 
 
 
 **Partie 3** : Nombre de paquets reçu, et traités.
 
-![image-20210429100119572](.\images\image-20210429100119572.png)
+![image-20210429100119572](./images/image-20210429100119572.png)
 
 **Partie 4** : Filtrage des différentes paquets par protocole
 
