@@ -563,7 +563,9 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+**Réponse :
+fragroute : intercepte, modifie et réécris le trafic de sortie pour un hôte spécifié
+fragrouter : permet d'éviter la détection d'intrusion réseau**  
 
 ---
 
@@ -572,7 +574,9 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+**Réponse :
+fragroute : It features a simple ruleset language to delay, duplicate, drop, fragment, overlap, print, reorder, segment, source-route, or otherwise monkey with all outbound packets destined for a target host, with minimal support for randomized or probabilistic behaviour. (source : https://tools.kali.org/information-gathering/fragroute)
+fragrouter : l'attaquant envoie ses packets ip au fragrouter qui va ensuite les fragmenter et les envoyer à la victime**  
 
 ---
 
@@ -581,7 +585,7 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 ---
 
-**Réponse :**  
+**Réponse : c'est un module de defragmentation de paquet. Il offre une execution plus rapide ainsi qu'une gestion de données moins complexe. Il permet également de contrer les méthodes d'évasions telles que fragroute et fragrouter**  
 
 ---
 
@@ -595,7 +599,7 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 
 ---
 
-**Réponse :**  
+**Réponse : alert tcp any any -> 192.168.1.2 22 (flags:S; msg:"SYN scan"; sid:4000020; rev:1;)**  
 
 ---
 
@@ -638,7 +642,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse : il inspecte le trafic SSL et TLS et peut décider d'arrêter l'inspection à un instant précis.**  
 
 ---
 
@@ -647,7 +651,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse : il détecte et filtre les données sensibles telles que un numéro de carte de crédit, un numéro de sécurité sociale ou encore un email. il est également possible de définire des données sensibles.**  
 
 ---
 
@@ -658,7 +662,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Réponse :**  
+**Réponse : snort est un outil puissant et modulable pour la détection de menaces sur le réseau. Il est très complet et beaucoup d'informations sont disponibles sur internet pour en faciliter la prise en main. Cependant, les fonctions les plus avancées sont assez complexes à comprendre et utiliser.**  
 
 ---
 
