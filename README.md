@@ -1,5 +1,7 @@
 # Teaching-HEIGVD-SRX-2021-Laboratoire-Snort
 
+Auteurs: Alexandra Cerottini & Fiona Gamboni
+
 **Ce travail de laboratoire est à faire en équipes de 2 personnes**
 
 **ATTENTION : Commencez par créer un Fork de ce repo et travaillez sur votre fork.**
@@ -710,7 +712,7 @@ En utilisant l'option `itype:8` permettant de traiter uniquement les echo reques
 
 Dans `/var/log/snort/alert`
 
-![image-20210422142647481](/images/image-20210422142647481.png)
+![image-20210422142647481](images/image-20210422142647481.png)
 
 ---
 
@@ -722,7 +724,7 @@ Dans `/var/log/snort/alert`
 
 Les pings echo request (dans ce cas en provenance de la machine Client vers l'IDS) ont été journalisé dans le fichier log.
 
-![image-20210422142935215](/images/image-20210422142935215.png)
+![image-20210422142935215](images/image-20210422142935215.png)
 
 ---
 
@@ -772,7 +774,7 @@ Sachant que le protocole SSH utilise le port TCP 22, on alerte si une tentative 
 
 **Réponse :**  
 
-TODO
+Le message ne s'enregistre pas dans le fichier d'alerte. Nous avons demandé des explications au professeur qui a le même problème chez lui.
 
 ---
 
@@ -818,7 +820,7 @@ On redirige l'analyse du trafic dans un fichier pcap où les règles seront appl
 
 **Réponse :**  
 
-TODO
+Non. 
 
 ---
 
@@ -912,7 +914,7 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 Résultat de `nmap -sS -p 22 192.168.1.2`:
 
-![image-20210422160159170](/images/image-20210422160159170.png)
+![image-20210422160159170](images/image-20210422160159170.png)
 
 L'alerte a été journalisée.
 
@@ -925,7 +927,6 @@ L'alerte n'a pas été journalisée. On a pu contourner la détection grâce à 
 
 Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocessor` et refaire la tentative.
 
-
 **Question 24: Quel est le résultat ?**
 
 ---
@@ -934,7 +935,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 L'alerte est cette fois-ci journalisée avec la commande `nmap -sS -f -p 22 --send-eth 192.168.1.2` car le préprocesseur permet de défragmenter le message.
 
-![image-20210422161142680](/images/image-20210422161142680.png)
+![image-20210422161142680](images/image-20210422161142680.png)
 
 ---
 
@@ -968,6 +969,8 @@ Le Sensitive Data préprocesseur est un module Snort qui effectue la détection 
 ---
 
 **Réponse :**  
+
+Ce laboratoire nous a permis de découvrir le NIDS snort. Au fil du laboratoire, nous nous sommes familiarisées avec l'écriture de règles basiques et avons bien compris leur fonctionnement. Bien que nous ne l'ayons pas directement expérimenté, nous avons remarqué que Snort peut permettre d'établir des règles bien plus conséquentes et puissantes, notamment à l'aide des divers préprocesseurs. Ainsi, Snort dans toute ses capacités peut permettre une analyse poussée du trafic.
 
 ---
 
