@@ -738,7 +738,7 @@ Elle permet de détecter des connexions venant de la machine client, peu importe
 
 ---
 
-**Réponse :**  Bizarrement Snort ne met rien dans le fichier *alert* et crée un fichier snort.log.xxxxxxxxxx vide. Même en ayant tester Snort sur une VM Kali dans le cas où le problème viendrait du WSL, même résultat... Discussion sur Teams avec M. Rubinstein concernant ce problème.
+**Réponse :**  Bizarrement Snort ne met rien dans le fichier *alert* et crée un fichier snort.log.xxxxxxxxxx vide. Même en ayant tester Snort sur une VM Kali dans le cas où le problème viendrait du WSL, même résultat... Discussion sur Teams avec M. Rubinstein concernant ce problème. Comme dernière tentative, nous avons essayé de modifier le port d'écoute de ssh (22 -> 2222), de supprimer la liste des hôtes connus du côté Client et aussi d'utiliser la commande `scp` pour générer du trafic ssh en ayant au préalable simplifié la règle : `alert tcp 192.168.1.3 any -> 192.168.1.2 2222 (msg:"SSH Connection detected"; sid:4000018; rev:1;)` mais rien n'a fonctionné, les fichiers restent vides...
 
 ---
 
