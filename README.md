@@ -531,7 +531,7 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 ---
 
-**Réponse :**  
+**Réponse : snort -r \<FILENAME\>**  
 
 ---
 
