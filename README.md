@@ -643,20 +643,19 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Réponse :**  
+**Réponse :**  alert tcp 192.168.1.3 any -> 192.168.1.2 22 (msg:"Detection d'une tentative de login SSH";sid:4000001;)
 
 ---
-
 
 **Question 15: Montrer le message enregistré dans le fichier d'alertes.** 
 
 ---
 
-**Réponse :**  
+**Réponse :**  Il n'y en a pas !! On n'a pas pu trouver la solution
 
 ---
 
---
+
 
 ### Analyse de logs
 
