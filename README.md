@@ -348,6 +348,10 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 **Réponse :**  
 
+Ils permettent d'étendre les fonctionnalités de Snort, et sont sous forme de "plugins". Ils sont exécutés avant la détection mais juste après que le paquet soit décodé. Ils peuvent notamment servir pour désencapsuler les paquets et lire les données des couches supérieures pour repérer des attaques. Avec les preprocesseurs, on peut traiter/analyser le paquet en mode hors ligne.
+
+Preprocessor code is run before the detection engine is called, but after the packet has been decoded. The packet can be modified or analyzed in an out-of-band manner using this mechanism. (http://manual-snort-org.s3-website-us-east-1.amazonaws.com/node17.html).
+
 ---
 
 **Question 2: Pourquoi êtes vous confronté au WARNING suivant `"No preprocessors configured for policy 0"` lorsque vous exécutez la commande `snort` avec un fichier de règles ou de configuration "fait-maison" ?**
@@ -355,6 +359,8 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 ---
 
 **Réponse :**  
+
+Car aucun preprocessor n'est chargé pour le fichier de règle en cours.
 
 ---
 
@@ -372,6 +378,8 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 **Réponse :**  
 
+Afficher une alerte et journalise tout segment TCP de n'importe quelle source à n'importe quelle destination dont le contenu (payload) contient la chaîne "Rubinstein". L'ID de la règle est 4000015 et c'est la première révision. Si un paquet TCP de source et destination quelconque contient Rubinstein, le log Mon nom! sera écrit dans les fichiers logs.
+
 ---
 
 Utiliser nano pour créer un fichier `myrules.rules` sur votre répertoire home (```/root```). Rajouter une règle comme celle montrée avant mais avec votre text, phrase ou mot clé que vous aimeriez détecter. Lancer Snort avec la commande suivante :
@@ -384,8 +392,102 @@ sudo snort -c myrules.rules -i eth0
 
 ---
 
-**Réponse :**  
+**Réponse :**  D'abord on voit des messages relatifs aux différentes initalisations de Snort (plugins, preprocessors, rules,...):  
+```
+Running in IDS mode
 
+        --== Initializing Snort ==--
+Initializing Output Plugins!
+Initializing Preprocessors!
+Initializing Plug-ins!
+Parsing Rules file "myrules.rules"
+Tagged Packet Limit: 256
+Log directory = /var/log/snort
+```
+
+Ensuite, Snort fait une synthèse des règles qu'il a pu lire dans les fichiers:  
+
+```
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Initializing rule chains...
+1 Snort rules read
+    1 detection rules
+    0 decoder rules
+    0 preprocessor rules
+1 Option Chains linked into 1 Chain Headers
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++-------------------[Rule Port Counts]---------------------------------------
+|             tcp     udp    icmp      ip
+|     src       0       0       0       0
+|     dst       0       0       0       0
+|     any       1       0       0       0
+|      nc       0       0       0       0
+|     s+d       0       0       0       0
++----------------------------------------------------------------------------
+```
+
+On a après divers valeurs de configurations et état :  
+```
+
++-----------------------[detection-filter-config]------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[detection-filter-rules]-------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[rate-filter-config]-----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[rate-filter-rules]------------------------------------
+| none
+-------------------------------------------------------------------------------
+
++-----------------------[event-filter-config]----------------------------------
+| memory-cap : 1048576 bytes
++-----------------------[event-filter-global]----------------------------------
++-----------------------[event-filter-local]-----------------------------------
+| none
++-----------------------[suppression]------------------------------------------
+| none
+-------------------------------------------------------------------------------
+Rule application order: pass->drop->sdrop->reject->alert->log
+Verifying Preprocessor Configurations!
+
+[ Port Based Pattern Matching Memory ]
++-[AC-BNFA Search Info Summary]------------------------------
+| Instances        : 1
+| Patterns         : 1
+| Pattern Chars    : 11
+| Num States       : 11
+| Num Match States : 1
+| Memory           :   1.69Kbytes
+|   Patterns       :   0.05K
+|   Match Lists    :   0.12K
+|   Transitions    :   1.12K
++-------------------------------------------------
+pcap DAQ configured to passive.
+Acquiring network traffic from "eth0".
+Reload thread starting...
+Reload thread started, thread 0x7f89aa92c700 (1190)
+Decoding Ethernet
+```
+
+Pour finir, on nous indique que l'initialisation s'est terminée et que l'analyse des paquets commence. On voit aussi des valeurs concernant la version de Snort ainsi que de ses libs:  
+```
+       --== Initialization Complete ==--
+
+   ,,_     -*> Snort! <*-
+  o"  )~   Version 2.9.15.1 GRE (Build 15125)
+   ''''    By Martin Roesch & The Snort Team: http://www.snort.org/contact#team
+           Copyright (C) 2014-2019 Cisco and/or its affiliates. All rights reserved.
+           Copyright (C) 1998-2013 Sourcefire, Inc., et al.
+           Using libpcap version 1.10.0 (with TPACKET_V3)
+           Using PCRE version: 8.39 2016-06-14
+           Using ZLIB version: 1.2.11
+
+Commencing packet processing (pid=1189)
+
+```
 ---
 
 Aller à un site web contenant dans son text la phrase ou le mot clé que vous avez choisi (il faudra chercher un peu pour trouver un site en http... Si vous n'y arrivez pas, vous pouvez utiliser [http://neverssl.com](http://neverssl.com) et modifier votre votre règle pour détecter un morceau de text contenu dans le site).
@@ -394,7 +496,12 @@ Aller à un site web contenant dans son text la phrase ou le mot clé que vous a
 
 ---
 
-**Réponse :**  
+**Réponse :** 
+Sur le client (requête avec wget) : 
+
+![](images/Q5.jpg)
+
+Sur l'IDS : La ligne *WARNING : No preprocessors configured for policy 0* s'affiche plusieurs fois. On imagine le nombre de fois qu'un paquet est intercepté par Snort.
 
 ---
 
@@ -406,6 +513,15 @@ Arrêter Snort avec `CTRL-C`.
 
 **Réponse :**  
 
+Snort affiche ses statistiques d'utilisation : temps d'exécution, nb de paquets traités nb de paquets par minutes, etc.
+
+Il affiche ensuite ses statistiques d'utilisation mémoire, puis des statistiques plus avancées sur les paquets entrants/sortants (paquets reçus, rejetés, filtrés, etc).
+
+On peut observer un aperçu des types de protocole qui ont été analysés par Snort (TCP, IP, UDP, IPv6,...).
+En dernier lieu, on peut voir le traitement effectué aux paquets grâce aux rules définies.
+
+![](images/Q6.jpg)
+
 ---
 
 
@@ -416,6 +532,14 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 ---
 
 **Réponse :**  
+
+![](images/Q7.jpg)
+
+- La première ligne nous informe de l'id de l'alerte levée avec le message qui avait été configuré dans le .rules. 
+- La seconde ligne nous informe d'une certaine priorité.
+- La troisième ligne nous indique la date/heure de l'alerte et de l'ip/port source de source et de destination. On voit qu'il y a 2 alertes, car comme on a configuré l'IDS comme passerelle par défaut du Client, Snort a détecté le paquet qui arrivait dans l'IDS et le paquet qui était redirigé au Client.
+- La quatrième ligne nous montre le protocole transport utilisé et les valeurs des différents champs IP : le TTL, l'en-tête IP Type of Service (TOS), l'ID du fragment IP, le nb. de bytes des en-têtes IP (20), et la taille total du datagramme (1460B)
+- La cinquième ligne nous donne des informations sur le protocole de transport utilisé : no de séquence, no d'ACK, taille de fenêtre
 
 ---
 
@@ -431,6 +555,13 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 ---
 
 **Réponse :**  
+En faisant un `nslookup wikipedia.org`, on obtient l'adresse IP 91.198.174.192. Si l'on cherche à quelle plage d'adresses cette IP appartient (en utilisant stat.ripe.net), on obtient la plage `91.198.174.0/24` qui appartient à Wikipedia.
+
+On peut donc écrire une règle comme ceci : `log tcp 192.168.1.3 any -> 91.198.174.0/24 any (sid:4000017; rev:1;)`
+
+Le contenu journalisé est le suivant :
+
+![](images/Q8.jpg)
 
 ---
 
@@ -446,6 +577,8 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+`alert icmp any any -> 192.168.1.2 any (msg:"Pinged IDS"; itype:8; sid:4000017; rev:1;)`
+
 ---
 
 
@@ -454,6 +587,8 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 ---
 
 **Réponse :**  
+
+On veut détecter que les echo request (ICMP type 8), car si l'on détecte également les echo reply, notre règle se déclencherait aussi pour les pings depuis l'IDS. 
 
 ---
 
@@ -464,14 +599,20 @@ Ecrire une règle qui alerte à chaque fois que votre machine IDS reçoit un pin
 
 **Réponse :**  
 
+dans `/var/log/snort/alert`
+
 ---
 
 
-**Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log` **
+**Question 12: Qu'est-ce qui a été journalisé ? (vous pouvez lire les fichiers log utilisant la commande `tshark -r nom_fichier_log`**
 
 ---
 
 **Réponse :**  
+
+Les paquets que la règle a détectés, autrement dit, les demandes d'ECHO request vers la machine IDS.
+
+![](images/Q12.jpg)
 
 ---
 
@@ -486,6 +627,8 @@ Faites le nécessaire pour que les pings soient détectés dans les deux sens.
 ---
 
 **Réponse :**  
+
+On peut modifier l'opérateur `->` en `<>` pour que la règle précédente soit valide dans les deux sens.
 
 ---
 
@@ -502,6 +645,8 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 **Réponse :**  
 
+`alert tcp 192.168.0.95 any -> 192.168.0.251 22 (msg:"Tentative de connexion SSH"; sid:1000002; rev:1;)`
+
 ---
 
 
@@ -510,6 +655,15 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 ---
 
 **Réponse :**  
+
+```
+[**] [1:1000002:1] Tentative de connexion SSH [**]
+[Priority: 0]
+04/29-00:35:18.795320 192.168.0.95:50350 -> 192.168.0.251:22
+TCP TTL:64 TOS:0x0 ID:51371 IpLen:20 DgmLen:52 DF
+***A**** Seq: 0x88ABF316  Ack: 0x69F66322  Win: 0x1F5  TcpLen: 32
+TCP Options (3) => NOP NOP TS: 1440002463 2703763045
+```
 
 ---
 
@@ -533,6 +687,8 @@ Générez du trafic depuis le deuxième terminal qui corresponde à l'une des r�
 
 **Réponse :**  
 
+`snort -r <file>` => Read a single pcap.
+
 ---
 
 Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshark que vous venez de générer.
@@ -543,6 +699,10 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 **Réponse :**  
 
+Au lieu d'analyser en temps réel les paquets qui entrent et sortent de l'interface, il analyse uniquement les paquets du `.pcap` puis se termine. Aussi, l'analyse temps réel ne semble pas afficher le détail du trafic directement dans la console. Avec l'analyse ultérieure utilisant `snort -r`, on obtient la même output qu'en temps réel mais avec le détail pour chaque trafic intercepté :
+
+![](images/Q17.jpg)
+
 ---
 
 **Question 18: Est-ce que des alertes sont aussi enregistrées dans le fichier d'alertes?**
@@ -550,6 +710,8 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 ---
 
 **Réponse :**  
+
+En utilisant tshark, tout le trafic est enregistré dans le fichier `.pcap`, il n'y a pas d'alertes dans un autre fichier. Si on ajoute l'option `-c` en lui passant un fichier de rules, il va afficher les alertes dans `/var/log/snort/alert`, comme pour une capture temps réel.
 
 ---
 
@@ -565,6 +727,15 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
+Les deux sont des outils de pentest.
+
+- `fragroute` :  intercepts, modifies, and rewrites egress traffic destined for a specified host
+- `fragrouter` : a network intrusion detection evasion toolkit
+
+Source : 
+- https://tools.kali.org/information-gathering/fragroute 
+- https://tools.kali.org/information-gathering/fragrouter
+
 ---
 
 
@@ -574,6 +745,12 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 
 **Réponse :**  
 
+- `fragroute` : It features a simple ruleset language to delay, duplicate, drop, fragment, overlap, print, reorder, segment, source-route, or otherwise monkey with all outbound packets destined for a target host
+- `fragrouter` : fragrouter is just a one-way fragmenting router – IP packets get sent from the attacker to the fragrouter, which transforms them into a fragmented data stream to forward to the victim.
+
+Source : 
+- https://tools.kali.org/information-gathering/fragroute 
+- https://tools.kali.org/information-gathering/fragrouter
 ---
 
 
@@ -582,6 +759,15 @@ Faire des recherches à propos des outils `fragroute` et `fragrouter`.
 ---
 
 **Réponse :**  
+
+The `frag3 preprocessor` is a target-based IP defragmentation module for Snort.  It is used to mitigate attacks such as an attacker can determine what style of IP defragmentation being used on a particular target, the attacker can try to fragment packets such that the target will put them back together in a specific manner. 
+
+Le but du module est de fournir à l'IDS des informations sur les hôtes du réseau afin qu'il puisse éviter les attaques de type Ptacek & Newsham basées sur des informations sur le fonctionnement de la pile IP d'une machine individuelle. Ce module permet aussi une exécution plus rapide dans les environnements avec beaucoup de paquets fragmentés avec une gestion des données moins complexe.
+
+Ce module se met en place en activant au moins 2 directives préproceseur.
+
+Source :
+- https://www.snort.org/faq/readme-frag3
 
 ---
 
@@ -596,6 +782,8 @@ L'outil nmap propose une option qui fragmente les messages afin d'essayer de con
 ---
 
 **Réponse :**  
+
+`alert tcp any any -> 192.168.1.2 22 (msg:"SYN sur le port 22"; flags:S; sid:4000031; rev:1)` 
 
 ---
 
@@ -619,6 +807,12 @@ nmap -sS -f -p 22 --send-eth 192.168.1.2
 
 **Réponse :**  
 
+Sans fragmenter, Snort arrive bien à alerter :
+
+![](images/Q22.jpg)
+
+En utilisant la version fragmentée, Snort n'arrive pas à alerter. On peut donc bien contourner l'IDS en utilisant la fragmentation.
+
 ---
 
 
@@ -631,6 +825,16 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
+Contenu du `myrules.rules` :
+
+```
+preprocessor frag3_global
+preprocessor frag3_engine
+alert tcp any any -> 192.168.1.2 22 (msg:"SYN sur le port 22"; flags:S; sid:4000031; rev:1)
+```
+
+Désormais, même en fragmentant l'attaque, Snort le détectera et il ne sera donc pas possible de le contourner de cette manière.
+
 ---
 
 
@@ -640,14 +844,27 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 **Réponse :**  
 
----
+The SSL Dynamic Preprocessor (SSLPP) decodes SSL and TLS traffic and optionally determines if and when Snort should stop inspection of it. 
 
+On améliore ainsi les performances en n'inspectant pas les paquets chiffrés.
+
+Source :
+- https://www.snort.org/faq/readme-ssl
+
+---
 
 **Question 26: A quoi sert le `Sensitive Data Preprocessor` ?**
 
 ---
 
 **Réponse :**  
+
+The Sensitive Data preprocessor is a Snort module that performs detection and filtering of Personally Identifiable Information (PII). This information includes credit card numbers, U.S. Social Security numbers, and email addresses.
+
+On peut ainsi filtrer les potentielles données sensibles en clair sortantes du réseau.
+
+Source :
+- https://www.snort.org/faq/readme-sensitive_data
 
 ---
 
@@ -659,6 +876,8 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 ---
 
 **Réponse :**  
+
+Snort semble être un outil très puissant et capable de détecter des intrusions avec une granularité très fine. La courbe d'apprentissage est assez élevée et demande  beaucoup de tests afin de vérifier que les règles écrites fonctionnent comme prévu. Snort requiert de lire attentivement la documentation (parfois assez complexe) car l'absence de certains paramètres (Frag3 Preprocessor) permet à des attaquants de contourner l'IDS assez aisément.
 
 ---
 

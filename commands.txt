@@ -1,0 +1,26 @@
+IDS :
+iptables-legacy -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+echo "include /etc/snort/rules/icmp2.rules" > /etc/snort/mysnort.conf
+echo "alert icmp any any -> any any (msg:"ICMP Packet"; sid:4000001; rev:3;)" > /etc/snort/rules/icmp2.rules
+snort -c /etc/snort/mysnort.conf
+
+echo "alert tcp any any -> any any (msg:"Mon adresse mail!"; content:"dany.oliveiradacosta@heig-vd.ch"; sid:4000016; rev:1;)" > /root/myrules.rules
+snort -c /root/myrules.rules -i eth0
+
+Client:
+
+ip route del default 
+ip route add default via 192.168.1.2
+
+
+
+
+
+
+
+
+
+
+ps aux
+kill -9 PID
